@@ -13,6 +13,18 @@ REE is a reference architecture for ethical agency under uncertainty. This imple
 - **Residue Field φ(z)**: Persistent moral cost as geometric deformation
 - **Grid World Environment**: Toy environment with harm/benefit signals
 
+## Documentation
+
+📚 **[Complete Documentation](docs/)** - Comprehensive guides and references
+
+- **[Getting Started](docs/getting-started.md)** - Quick setup and first steps
+- **[Architecture Guide](docs/architecture.md)** - Detailed architectural overview
+- **[API Reference](docs/api-reference.md)** - Complete API documentation
+- **[Configuration](docs/configuration.md)** - Configuration options and tuning
+- **[Advanced Usage](docs/advanced-usage.md)** - Advanced patterns and techniques
+- **[Contributing](docs/CONTRIBUTING.md)** - How to contribute to the project
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
+
 ## Architecture
 
 ```
@@ -144,6 +156,21 @@ J(ζ) = F(ζ) + λ·M(ζ) + ρ·Φ_R(ζ)
 - **F(ζ)**: Reality constraint (predictive coherence, physical viability)
 - **M(ζ)**: Ethical cost (predicted degradation of self/others)
 - **Φ_R(ζ)**: Residue field (persistent curvature from past harm)
+
+## Learn More
+
+- 📖 **[Documentation](docs/)** - Complete guides and API reference
+- 🎯 **[Examples](examples/)** - Working code examples
+- 🧪 **[Tests](tests/)** - Test suite and usage patterns
+- 🤝 **[Contributing](docs/CONTRIBUTING.md)** - How to contribute
+
+## Key Features
+
+✅ **Multi-timescale Latent Representation**: Hierarchical state spanning perception to motivation  
+✅ **Ethical Path-Dependence**: Geometric residue field makes moral cost trajectory-dependent  
+✅ **Architectural Invariants**: Residue cannot be erased, ensuring ethical continuity  
+✅ **Predictive Processing**: Unified framework based on precision-weighted prediction errors  
+✅ **Extensible Design**: Easy to integrate with custom environments and components  
 
 ## License
 
