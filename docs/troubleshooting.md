@@ -401,8 +401,11 @@ class GymWrapper:
         obs = torch.from_numpy(np.array(obs)).float()
         
         # Convert reward to harm signal
-        # You may need to invert or scale this
-        harm_signal = reward
+        # REE expects: negative = harm, positive = benefit
+        # If your env uses standard RL rewards (higher = better):
+        #   harm_signal = -reward  # Invert
+        # If your env already uses harm convention:
+        harm_signal = reward  # Direct (assumes reward is already in harm format)
         
         return obs, harm_signal, done, info
 ```

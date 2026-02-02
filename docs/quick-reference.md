@@ -223,10 +223,10 @@ docs/
 
 ## Links
 
-- [Full Documentation](docs/)
-- [Getting Started](docs/getting-started.md)
-- [API Reference](docs/api-reference.md)
-- [Troubleshooting](docs/troubleshooting.md)
+- [Full Documentation](.)
+- [Getting Started](getting-started.md)
+- [API Reference](api-reference.md)
+- [Troubleshooting](troubleshooting.md)
 
 ## Help
 
