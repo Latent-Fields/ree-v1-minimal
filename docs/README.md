@@ -4,6 +4,15 @@ Welcome to the comprehensive documentation for the Reflective-Ethical Engine (RE
 
 ## 📖 Documentation Structure
 
+### Quick Start
+
+- **[Quick Reference](quick-reference.md)** - Cheat sheet for common operations
+  - Installation commands
+  - Agent creation
+  - Configuration snippets
+  - Common patterns
+  - File locations
+
 ### Getting Started
 
 - **[Getting Started Guide](getting-started.md)** - Installation, setup, and your first agent
@@ -145,7 +154,11 @@ Where:
 - **M(ζ)** - Ethical cost (predicted harm)
 - **Φ_R(ζ)** - Residue field (path-dependent moral cost)
 
-## 📚 Documentation by Use Case
+## 📚 Quick Links by Topic
+
+### "I need a quick reference"
+
+→ [Quick Reference](quick-reference.md) - Cheat sheet for common operations
 
 ### "I want to get started quickly"
 

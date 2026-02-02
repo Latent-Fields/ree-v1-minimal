@@ -17,6 +17,9 @@ REE is a reference architecture for ethical agency under uncertainty. This imple
 
 📚 **[Complete Documentation](docs/)** - Comprehensive guides and references
 
+### Quick Links
+
+- **[Quick Reference](docs/quick-reference.md)** ⚡ - Cheat sheet for common operations
 - **[Getting Started](docs/getting-started.md)** - Quick setup and first steps
 - **[Architecture Guide](docs/architecture.md)** - Detailed architectural overview
 - **[API Reference](docs/api-reference.md)** - Complete API documentation
