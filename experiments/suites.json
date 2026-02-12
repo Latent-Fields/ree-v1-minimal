@@ -1,0 +1,55 @@
+{
+  "baseline_explicit_cost": {
+    "description": "Default REE-v1-minimal scoring: J = F + λM + ρΦ_R",
+    "flags": {
+      "use_explicit_M_term": true,
+      "use_residue": true,
+      "use_offline_integration": true
+    },
+    "overrides": {
+      "e3": {
+        "lambda_ethical": 1.0,
+        "rho_residue": 1.0
+      }
+    }
+  },
+
+  "no_explicit_M": {
+    "description": "Remove explicit ethical term by setting λ=0; residue remains active.",
+    "flags": {
+      "use_explicit_M_term": false,
+      "use_residue": true,
+      "use_offline_integration": true
+    },
+    "overrides": {
+      "e3": {
+        "lambda_ethical": 0.0,
+        "rho_residue": 1.0
+      }
+    }
+  },
+
+  "no_residue": {
+    "description": "Disable residue contribution (ρ=0) and skip residue updates.",
+    "flags": {
+      "use_explicit_M_term": true,
+      "use_residue": false,
+      "use_offline_integration": true
+    },
+    "overrides": {
+      "e3": {
+        "lambda_ethical": 1.0,
+        "rho_residue": 0.0
+      }
+    }
+  },
+
+  "no_sleep": {
+    "description": "Disable offline integration step (sleep-like integration).",
+    "flags": {
+      "use_explicit_M_term": true,
+      "use_residue": true,
+      "use_offline_integration": false
+    }
+  }
+}
