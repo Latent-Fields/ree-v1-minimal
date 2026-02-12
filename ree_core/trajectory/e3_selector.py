@@ -204,11 +204,10 @@ class E3TrajectorySelector(nn.Module):
         residue_cost = self.compute_residue_cost(trajectory)
 
         # Weighted combination
-        total_score = (
-            reality_cost +
-            self.config.lambda_ethical * ethical_cost +
-            self.config.rho_residue * residue_cost
-        )
+        ethical_term = self.config.lambda_ethical * ethical_cost
+residue_term = self.config.rho_residue * residue_cost
+
+total_score = reality_cost + ethical_term + residue_term
 
         return total_score
 
