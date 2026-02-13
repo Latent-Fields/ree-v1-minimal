@@ -29,6 +29,8 @@ FIXTURE_RUN_DIR = (
     / "2026-02-13T060000Z_baseline-explicit-cost_seed0"
 )
 SNAKE_CASE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+ADAPTER_SCHEMA_VERSION = "jepa_adapter_signals/v1"
+JEPA_RUNNER_NAME = "ree-v1-minimal-harness"
 REQUIRED_ENVIRONMENT_FIELDS = (
     "env_id",
     "env_version",
@@ -132,6 +134,48 @@ def _schema(name: str) -> dict[str, Any]:
     return _load_json(SCHEMA_DIR / name)
 
 
+def _assert_adapter_signals_shape(adapter: dict[str, Any], manifest: dict[str, Any]) -> None:
+    assert adapter["schema_version"] == ADAPTER_SCHEMA_VERSION
+    assert adapter["experiment_type"] == manifest["experiment_type"]
+    assert adapter["run_id"] == manifest["run_id"]
+
+    assert isinstance(adapter["adapter"], dict)
+    assert isinstance(adapter["adapter"]["name"], str) and adapter["adapter"]["name"]
+    assert isinstance(adapter["adapter"]["version"], str) and adapter["adapter"]["version"]
+
+    stream_presence = adapter["stream_presence"]
+    assert stream_presence["z_t"] is True
+    assert stream_presence["z_hat"] is True
+    assert stream_presence["pe_latent"] is True
+    assert stream_presence["trace_context_mask_ids"] is True
+    assert isinstance(stream_presence["uncertainty_latent"], bool)
+    assert isinstance(stream_presence["trace_action_token"], bool)
+
+    pe_latent_fields = adapter["pe_latent_fields"]
+    assert isinstance(pe_latent_fields, list)
+    assert "mean" in pe_latent_fields
+    assert "p95" in pe_latent_fields
+
+    assert adapter["uncertainty_estimator"] in {"none", "dispersion", "ensemble", "head"}
+
+    metrics = adapter["signal_metrics"]
+    for key in (
+        "latent_prediction_error_mean",
+        "latent_prediction_error_p95",
+        "latent_residual_coverage_rate",
+        "precision_input_completeness_rate",
+    ):
+        assert isinstance(metrics[key], (int, float)) and not isinstance(metrics[key], bool)
+    assert metrics["latent_prediction_error_mean"] >= 0
+    assert metrics["latent_prediction_error_p95"] >= 0
+    assert 0 <= metrics["latent_residual_coverage_rate"] <= 1
+    assert 0 <= metrics["precision_input_completeness_rate"] <= 1
+    if stream_presence["uncertainty_latent"]:
+        assert "latent_uncertainty_calibration_error" in metrics
+        assert isinstance(metrics["latent_uncertainty_calibration_error"], (int, float))
+        assert metrics["latent_uncertainty_calibration_error"] >= 0
+
+
 def _assert_schema_valid_pack(run_dir: Path) -> None:
     manifest = _load_json(run_dir / "manifest.json")
     metrics = _load_json(run_dir / "metrics.json")
@@ -146,6 +190,16 @@ def _assert_schema_valid_pack(run_dir: Path) -> None:
 
     summary_text = (run_dir / "summary.md").read_text(encoding="utf-8").strip()
     assert summary_text, "summary.md must exist and contain text"
+
+    artifacts = manifest["artifacts"]
+    adapter_rel_path = artifacts.get("adapter_signals_path")
+    if manifest["runner"]["name"] == JEPA_RUNNER_NAME:
+        assert adapter_rel_path, "JEPA-backed runs must emit artifacts.adapter_signals_path"
+    if adapter_rel_path:
+        adapter_path = run_dir / adapter_rel_path
+        assert adapter_path.exists(), "adapter signals file must exist when declared"
+        adapter = _load_json(adapter_path)
+        _assert_adapter_signals_shape(adapter, manifest)
 
     assert "claim_ids_tested" in manifest
     assert isinstance(manifest["claim_ids_tested"], list)
@@ -240,12 +294,36 @@ def test_writer_emits_contract_shape(tmp_path: Path) -> None:
             "config_hash": "c1",
             "tier": "toy",
         },
+        adapter_signals={
+            "schema_version": ADAPTER_SCHEMA_VERSION,
+            "experiment_type": "baseline_explicit_cost",
+            "run_id": "2026-02-13T060000Z_baseline-explicit-cost_seed0",
+            "adapter": {"name": "ree_jepa_adapter", "version": "v1+0.1.0"},
+            "stream_presence": {
+                "z_t": True,
+                "z_hat": True,
+                "pe_latent": True,
+                "uncertainty_latent": False,
+                "trace_context_mask_ids": True,
+                "trace_action_token": False,
+            },
+            "pe_latent_fields": ["mean", "p95"],
+            "uncertainty_estimator": "none",
+            "signal_metrics": {
+                "latent_prediction_error_mean": 0.1,
+                "latent_prediction_error_p95": 0.2,
+                "latent_residual_coverage_rate": 0.4,
+                "precision_input_completeness_rate": 1.0,
+            },
+        },
     )
 
     assert emitted.run_dir.exists()
     assert emitted.manifest_path.exists()
     assert emitted.metrics_path.exists()
     assert emitted.summary_path.exists()
+    assert emitted.adapter_signals_path is not None
+    assert emitted.adapter_signals_path.exists()
     _assert_schema_valid_pack(emitted.run_dir)
 
 

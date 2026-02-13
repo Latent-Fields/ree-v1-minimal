@@ -1,0 +1,11 @@
+{
+  "ree_assembly_repo": "https://github.com/Latent-Fields/REE_assembly",
+  "ree_assembly_commit": "b718e670817a313f42f6c80ad027656b366af81d",
+  "contract_version": "experiment_pack/v1",
+  "schema_files": {
+    "contracts/ree_assembly/schemas/v1/manifest.schema.json": "ddbfeac9f4c75e8153f7c4c1bcfeebb46b5da1877ab0ffc6b548e020d4a220d3",
+    "contracts/ree_assembly/schemas/v1/metrics.schema.json": "d6eee5a1496f681c2ffc9244116ec0598ad961f891ac0a31dbc197f8be489db2",
+    "contracts/ree_assembly/schemas/v1/jepa_adapter_signals.v1.json": "1a722cbe38e188afe2c600827b333c12848583aa881a42caa52f2901f448bdf2"
+  },
+  "last_synced_utc": "2026-02-13T21:22:07Z"
+}

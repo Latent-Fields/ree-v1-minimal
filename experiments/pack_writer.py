@@ -25,6 +25,7 @@ from typing import Any, Mapping, Optional, Union
 
 MANIFEST_SCHEMA_VERSION = "experiment_pack/v1"
 METRICS_SCHEMA_VERSION = "experiment_pack_metrics/v1"
+ADAPTER_SIGNALS_SCHEMA_VERSION = "jepa_adapter_signals/v1"
 STOP_CRITERIA_VERSION = "stop_criteria/v1"
 OUTPUT_ROOT_ENV = "REE_EXPERIMENT_OUTPUT_ROOT"
 EVIDENCE_DIRECTIONS = {"supports", "weakens", "mixed", "unknown"}
@@ -64,6 +65,7 @@ class EmittedPack:
     manifest_path: Path
     metrics_path: Path
     summary_path: Path
+    adapter_signals_path: Optional[Path] = None
 
 
 def normalize_timestamp_utc(timestamp_utc: Optional[str] = None) -> str:
@@ -162,6 +164,7 @@ class ExperimentPackWriter:
         evidence_direction: Optional[str] = None,
         producer_capabilities: Optional[Mapping[str, bool]] = None,
         environment: Optional[Mapping[str, Any]] = None,
+        adapter_signals: Optional[Mapping[str, Any]] = None,
         traces_dir: Optional[str] = None,
         media_dir: Optional[str] = None,
     ) -> EmittedPack:
@@ -176,6 +179,11 @@ class ExperimentPackWriter:
         clean_evidence_direction = _clean_evidence_direction(evidence_direction)
         clean_producer_capabilities = _clean_producer_capabilities(producer_capabilities)
         clean_environment = _clean_environment(environment)
+        clean_adapter_signals = _clean_adapter_signals(
+            adapter_signals=adapter_signals,
+            experiment_type=experiment_type,
+            run_id=run_id,
+        )
 
         run_dir = self.output_root / experiment_type / "runs" / run_id
         run_dir.mkdir(parents=True, exist_ok=False)
@@ -183,6 +191,7 @@ class ExperimentPackWriter:
         metrics_path = run_dir / "metrics.json"
         summary_path = run_dir / "summary.md"
         manifest_path = run_dir / "manifest.json"
+        adapter_signals_path: Optional[Path] = None
 
         metrics_doc = {
             "schema_version": METRICS_SCHEMA_VERSION,
@@ -195,6 +204,13 @@ class ExperimentPackWriter:
             "metrics_path": "metrics.json",
             "summary_path": "summary.md",
         }
+        if clean_adapter_signals is not None:
+            adapter_signals_path = run_dir / "jepa_adapter_signals.v1.json"
+            adapter_signals_path.write_text(
+                json.dumps(clean_adapter_signals, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            artifacts["adapter_signals_path"] = adapter_signals_path.name
         if traces_dir:
             (run_dir / traces_dir).mkdir(parents=True, exist_ok=True)
             artifacts["traces_dir"] = traces_dir
@@ -238,6 +254,7 @@ class ExperimentPackWriter:
             manifest_path=manifest_path,
             metrics_path=metrics_path,
             summary_path=summary_path,
+            adapter_signals_path=adapter_signals_path,
         )
 
 
@@ -327,6 +344,23 @@ def _coerce_numeric(value: Any) -> Union[float, int]:
         if isinstance(item_value, (int, float)):
             return item_value
     raise TypeError(f"metrics values must be int/float, got {type(value)!r}")
+
+
+def _clean_adapter_signals(
+    adapter_signals: Optional[Mapping[str, Any]],
+    experiment_type: str,
+    run_id: str,
+) -> Optional[dict[str, Any]]:
+    if adapter_signals is None:
+        return None
+    if not isinstance(adapter_signals, Mapping):
+        raise TypeError("adapter_signals must be a mapping")
+
+    clean = dict(adapter_signals)
+    clean["schema_version"] = ADAPTER_SIGNALS_SCHEMA_VERSION
+    clean["experiment_type"] = experiment_type
+    clean["run_id"] = run_id
+    return clean
 
 
 def _dedupe_strings(values: list[str]) -> list[str]:

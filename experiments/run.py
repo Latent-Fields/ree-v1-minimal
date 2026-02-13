@@ -1,5 +1,6 @@
 import argparse
 import json
+import math
 from pathlib import Path
 import random
 import traceback
@@ -26,6 +27,8 @@ except ImportError:  # pragma: no cover - optional dependency in some local envs
     np = None
 
 MECH056_CLAIM_ID = "MECH-056"
+JEPA_ADAPTER_NAME = "ree_jepa_adapter"
+JEPA_ADAPTER_VERSION = "v1"
 
 
 def _clean_claim_ids(claim_ids: object) -> list[str]:
@@ -37,6 +40,33 @@ def _clean_claim_ids(claim_ids: object) -> list[str]:
         if value and value not in cleaned:
             cleaned.append(value)
     return cleaned
+
+
+def _to_float(value: object) -> float:
+    if isinstance(value, bool):
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    if hasattr(value, "item"):
+        item_value = value.item()
+        if isinstance(item_value, (int, float)) and not isinstance(item_value, bool):
+            return float(item_value)
+    return 0.0
+
+
+def _percentile(values: list[float], p: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    if len(ordered) == 1:
+        return ordered[0]
+    rank = max(0.0, min(1.0, p)) * (len(ordered) - 1)
+    low = int(math.floor(rank))
+    high = int(math.ceil(rank))
+    if low == high:
+        return ordered[low]
+    frac = rank - low
+    return ordered[low] * (1.0 - frac) + ordered[high] * frac
 
 
 def _resolve_environment_runtime_config(suite: dict) -> dict:
@@ -102,6 +132,67 @@ def _build_producer_capabilities() -> dict[str, bool]:
         "mech056_dispatch_metric_set": True,
         "mech056_summary_escalation_trace": True,
     }
+
+
+def _build_jepa_adapter_signals(
+    experiment_type: str,
+    run_id: str,
+    result: dict,
+    runner_version: str,
+) -> dict:
+    error_samples = [float(x) for x in result.get("adapter_latent_prediction_error_samples", [])]
+    steps = max(int(result.get("steps", 0)), 0)
+    precision_input_steps = max(int(result.get("adapter_precision_input_steps", 0)), 0)
+
+    if error_samples:
+        error_mean = sum(error_samples) / len(error_samples)
+        error_p95 = _percentile(error_samples, 0.95)
+        residual_coverage_rate = min(1.0, len(error_samples) / max(steps, 1))
+        notes = ""
+    else:
+        fallback_error = (
+            abs(float(result.get("final_residue", 0.0))) + float(result.get("total_harm", 0.0))
+        ) / max(steps, 1)
+        error_mean = fallback_error
+        error_p95 = fallback_error
+        residual_coverage_rate = 0.0
+        notes = (
+            "No committed latent prediction-error samples were observed; "
+            "deterministic fallback derived from total_harm and final_residue."
+        )
+
+    precision_input_completeness_rate = 0.0
+    if steps > 0:
+        precision_input_completeness_rate = min(1.0, precision_input_steps / steps)
+
+    adapter_doc = {
+        "schema_version": "jepa_adapter_signals/v1",
+        "experiment_type": experiment_type,
+        "run_id": run_id,
+        "adapter": {
+            "name": JEPA_ADAPTER_NAME,
+            "version": f"{JEPA_ADAPTER_VERSION}+{runner_version}",
+        },
+        "stream_presence": {
+            "z_t": True,
+            "z_hat": True,
+            "pe_latent": True,
+            "uncertainty_latent": False,
+            "trace_context_mask_ids": True,
+            "trace_action_token": False,
+        },
+        "pe_latent_fields": ["mean", "p95"],
+        "uncertainty_estimator": "none",
+        "signal_metrics": {
+            "latent_prediction_error_mean": error_mean,
+            "latent_prediction_error_p95": error_p95,
+            "latent_residual_coverage_rate": residual_coverage_rate,
+            "precision_input_completeness_rate": precision_input_completeness_rate,
+        },
+    }
+    if notes:
+        adapter_doc["notes"] = notes
+    return adapter_doc
 
 
 def _compute_mech056_metrics(result: dict) -> dict:
@@ -259,6 +350,8 @@ def run_experiment_episode(agent: REEAgent, env: GridWorld, max_steps: int) -> d
     hazard_event_count = 0
     collision_event_count = 0
     resource_event_count = 0
+    precision_input_steps = 0
+    latent_prediction_error_samples: list[float] = []
 
     done = False
     final_info = {"health": env.agent.health, "energy": env.agent.energy}
@@ -266,8 +359,14 @@ def run_experiment_episode(agent: REEAgent, env: GridWorld, max_steps: int) -> d
 
     for _ in range(max_steps):
         action = agent.act(observation)
+        if getattr(agent, "_current_latent", None) is not None:
+            precision_input_steps += 1
         observation, harm_signal, done, info = env.step(action)
-        agent.update_residue(harm_signal)
+        residue_update_metrics = agent.update_residue(harm_signal)
+        if "e3_prediction_error" in residue_update_metrics:
+            latent_prediction_error_samples.append(
+                _to_float(residue_update_metrics["e3_prediction_error"])
+            )
         if agent.should_integrate():
             agent.offline_integration()
 
@@ -305,6 +404,8 @@ def run_experiment_episode(agent: REEAgent, env: GridWorld, max_steps: int) -> d
         "collision_event_count": collision_event_count,
         "resource_event_count": resource_event_count,
         "fatal_error_count": 0,
+        "adapter_precision_input_steps": precision_input_steps,
+        "adapter_latent_prediction_error_samples": latent_prediction_error_samples,
     }
 
 
@@ -438,6 +539,8 @@ def execute_experiment(
             "collision_event_count": 0,
             "resource_event_count": 0,
             "fatal_error_count": 1,
+            "adapter_precision_input_steps": 0,
+            "adapter_latent_prediction_error_samples": [],
         }
 
     failure_signatures = known_failure_signatures(result)
@@ -461,6 +564,12 @@ def execute_experiment(
         metrics_values=metrics_values,
         failure_signatures=failure_signatures,
     )
+    adapter_signals = _build_jepa_adapter_signals(
+        experiment_type=suite_name,
+        run_id=resolved_run_id,
+        result=result,
+        runner_version=runner_version,
+    )
 
     repo_root = Path(__file__).resolve().parents[1]
     writer = ExperimentPackWriter(
@@ -483,6 +592,7 @@ def execute_experiment(
         evidence_direction=resolved_evidence_direction,
         producer_capabilities=producer_capabilities,
         environment=environment_metadata,
+        adapter_signals=adapter_signals,
         traces_dir=traces_dir,
     )
 
