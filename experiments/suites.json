@@ -1,6 +1,8 @@
 {
   "baseline_explicit_cost": {
     "description": "Default REE-v1-minimal scoring: J = F + λM + ρΦ_R",
+    "claim_ids_tested": ["MECH-056", "Q-011"],
+    "evidence_class": "simulation",
     "flags": {
       "use_explicit_M_term": true,
       "use_residue": true,
@@ -16,6 +18,8 @@
 
   "no_explicit_M": {
     "description": "Remove explicit ethical term by setting λ=0; residue remains active.",
+    "claim_ids_tested": ["MECH-056", "Q-011"],
+    "evidence_class": "ablation",
     "flags": {
       "use_explicit_M_term": false,
       "use_residue": true,
@@ -31,6 +35,8 @@
 
   "no_residue": {
     "description": "Disable residue contribution (ρ=0) and skip residue updates.",
+    "claim_ids_tested": ["MECH-034", "MECH-056"],
+    "evidence_class": "ablation",
     "flags": {
       "use_explicit_M_term": true,
       "use_residue": false,
@@ -46,6 +52,8 @@
 
   "no_sleep": {
     "description": "Disable offline integration step (sleep-like integration).",
+    "claim_ids_tested": ["MECH-018", "MECH-030"],
+    "evidence_class": "ablation",
     "flags": {
       "use_explicit_M_term": true,
       "use_residue": true,

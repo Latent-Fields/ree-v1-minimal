@@ -155,6 +155,32 @@ pytest tests/ --cov=ree_core       # With coverage
 pytest tests/ -m "not slow"        # Skip slow tests
 ```
 
+## Experiment Pack v1
+
+```bash
+# Emit an Experiment Pack run
+python experiments/run.py \
+  --suite baseline_explicit_cost \
+  --seed 0 \
+  --claim-id MECH-056 \
+  --claim-id Q-011 \
+  --output-root evidence/experiments
+
+# Output root via environment variable
+export REE_EXPERIMENT_OUTPUT_ROOT=evidence/experiments
+python experiments/run.py --suite no_residue --seed 1
+```
+
+Expected files:
+- `<output_root>/<experiment_type>/runs/<run_id>/manifest.json`
+- `<output_root>/<experiment_type>/runs/<run_id>/metrics.json`
+- `<output_root>/<experiment_type>/runs/<run_id>/summary.md`
+
+Manifest linkage fields:
+- `claim_ids_tested` (array of claim IDs)
+- `evidence_class` (for example `simulation`, `ablation`, `regression`)
+- `evidence_direction` (`supports`, `weakens`, `mixed`, or `unknown`)
+
 ## Common Patterns
 
 ### Batch Processing
