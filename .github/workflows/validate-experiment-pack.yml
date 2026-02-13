@@ -13,8 +13,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install validator dependency
-        run: python -m pip install --upgrade pip jsonschema
       - name: Validate emitted packs
         env:
           EXPERIMENT_PACK_ROOT: tests/fixtures/experiment_pack_v1

@@ -114,6 +114,7 @@ Output layout:
   manifest.json
   metrics.json
   summary.md
+  jepa_adapter_signals.v1.json   # required for JEPA-backed harness runs
   traces/    # optional
   media/     # optional
 ```
@@ -132,6 +133,15 @@ Field guarantees:
 - `manifest.status` is `PASS` or `FAIL`; known failures are surfaced in `failure_signatures`.
 - `manifest.json` includes `claim_ids_tested`, `evidence_class`, `evidence_direction`, `producer_capabilities`, and `environment`.
 - `environment` includes: `env_id`, `env_version`, `dynamics_hash`, `reward_hash`, `observation_hash`, `config_hash`, `tier`.
+- JEPA-backed harness runs (`runner.name = ree-v1-minimal-harness`) include:
+  - `manifest.artifacts.adapter_signals_path = "jepa_adapter_signals.v1.json"`
+  - `jepa_adapter_signals.v1.json` with required keys:
+    - `schema_version`, `experiment_type`, `run_id`
+    - `adapter.{name,version}`
+    - `stream_presence`
+    - `pe_latent_fields` (includes `mean` and `p95`)
+    - `uncertainty_estimator`
+    - `signal_metrics` with required metric keys/ranges
 
 MECH-056 extension:
 - when `claim_ids_tested` includes `MECH-056`, metrics include:
@@ -149,6 +159,29 @@ MECH-056 extension:
 
 Example output pack:
 - `/Users/dgolden/Documents/GitHub/ree-v1-minimal/examples/experiment_pack_example/claim_probe_mech_056/runs/2026-02-13T090000Z_example/`
+
+CI drift guard:
+
+```bash
+EXPERIMENT_PACK_ROOT=tests/fixtures/experiment_pack_v1 python scripts/validate_experiment_packs.py
+```
+
+Cross-repo contract lockstep:
+- lock file: `contracts/ree_assembly_contract_lock.v1.json`
+- vendored contract schemas:
+  - `contracts/ree_assembly/schemas/v1/manifest.schema.json`
+  - `contracts/ree_assembly/schemas/v1/metrics.schema.json`
+  - `contracts/ree_assembly/schemas/v1/jepa_adapter_signals.v1.json`
+- CI fails when either:
+  - lock-file hashes do not match vendored schemas
+  - emitted packs fail required manifest/metrics/adapter checks
+
+Contract update procedure:
+1. pick REE_assembly source commit to sync.
+2. copy schemas from that commit into `contracts/ree_assembly/schemas/v1/`.
+3. compute sha256 and update `contracts/ree_assembly_contract_lock.v1.json`.
+4. refresh fixture/example packs if required fields changed.
+5. run `EXPERIMENT_PACK_ROOT=tests/fixtures/experiment_pack_v1 python scripts/validate_experiment_packs.py`.
 
 Ingestion compatibility check (from `REE_assembly` checkout):
 
