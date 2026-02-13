@@ -93,6 +93,69 @@ pytest tests/ -v
 pytest tests/ -v --cov=ree_core
 ```
 
+## Experiment Pack v1 Emission
+
+Run the experiment harness and emit contract-compliant artifacts:
+
+```bash
+python experiments/run.py \
+  --suite baseline_explicit_cost \
+  --seed 7 \
+  --max-steps 200 \
+  --claim-id MECH-056 \
+  --claim-id Q-011 \
+  --output-root evidence/experiments
+```
+
+Output layout:
+
+```text
+<output_root>/<experiment_type>/runs/<run_id>/
+  manifest.json
+  metrics.json
+  summary.md
+  traces/    # optional
+  media/     # optional
+```
+
+Notes:
+- `--output-root` overrides output location.
+- If `--output-root` is omitted, `REE_EXPERIMENT_OUTPUT_ROOT` is used.
+- If neither is set, output defaults to `runs/`.
+- `run_id` is deterministic from `timestamp_utc + suite + seed` unless `--run-id` is provided.
+- claim linkage can be overridden with `--claim-id`, `--evidence-class`, and `--evidence-direction`.
+
+Field guarantees:
+- `manifest.json` uses schema version `experiment_pack/v1`.
+- `metrics.json` uses schema version `experiment_pack_metrics/v1`.
+- `metrics.values` contains numeric values only, keyed by stable snake_case metric IDs.
+- `manifest.status` is `PASS` or `FAIL`; known failures are surfaced in `failure_signatures`.
+- `manifest.json` includes `claim_ids_tested`, `evidence_class`, `evidence_direction`, `producer_capabilities`, and `environment`.
+- `environment` includes: `env_id`, `env_version`, `dynamics_hash`, `reward_hash`, `observation_hash`, `config_hash`, `tier`.
+
+MECH-056 extension:
+- when `claim_ids_tested` includes `MECH-056`, metrics include:
+  - `trajectory_commit_channel_usage_count`
+  - `perceptual_sampling_channel_usage_count`
+  - `structural_consolidation_channel_usage_count`
+  - `precommit_semantic_overwrite_events`
+  - `structural_bias_magnitude`
+  - `structural_bias_rate`
+  - `environment_shortcut_leakage_events`
+  - `environment_unobservable_critical_state_rate`
+  - `environment_controllability_score`
+  - `environment_transition_consistency_rate`
+- summary includes channel escalation order and trigger rationale for non-primary channel activations.
+
+Example output pack:
+- `/Users/dgolden/Documents/GitHub/ree-v1-minimal/examples/experiment_pack_example/claim_probe_mech_056/runs/2026-02-13T090000Z_example/`
+
+Ingestion compatibility check (from `REE_assembly` checkout):
+
+```bash
+python3 evidence/experiments/scripts/build_experiment_indexes.py --root /path/to/your/output_root
+```
+
 ## Project Structure
 
 ```

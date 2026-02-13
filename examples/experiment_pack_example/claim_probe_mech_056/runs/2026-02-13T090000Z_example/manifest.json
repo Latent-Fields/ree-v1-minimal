@@ -1,0 +1,46 @@
+{
+  "schema_version": "experiment_pack/v1",
+  "experiment_type": "claim_probe_mech_056",
+  "run_id": "2026-02-13T090000Z_example",
+  "status": "PASS",
+  "timestamp_utc": "2026-02-13T09:00:00Z",
+  "source_repo": {
+    "name": "ree-v1-minimal",
+    "commit": "1111111111111111111111111111111111111111",
+    "branch": "main"
+  },
+  "runner": {
+    "name": "ree-v1-minimal-harness",
+    "version": "0.1.0"
+  },
+  "scenario": {
+    "name": "claim_probe_mech_056",
+    "seed": 7,
+    "config_hash": "cfg_example_056"
+  },
+  "stop_criteria_version": "stop_criteria/v1",
+  "claim_ids_tested": [
+    "MECH-056"
+  ],
+  "evidence_class": "simulation",
+  "evidence_direction": "supports",
+  "failure_signatures": [],
+  "producer_capabilities": {
+    "trajectory_integrity_channelized_bias": true,
+    "mech056_dispatch_metric_set": true,
+    "mech056_summary_escalation_trace": true
+  },
+  "environment": {
+    "env_id": "ree.grid_world",
+    "env_version": "grid_world/v1",
+    "dynamics_hash": "dyn_example_056",
+    "reward_hash": "rew_example_056",
+    "observation_hash": "obs_example_056",
+    "config_hash": "cfg_env_example_056",
+    "tier": "stress"
+  },
+  "artifacts": {
+    "metrics_path": "metrics.json",
+    "summary_path": "summary.md"
+  }
+}

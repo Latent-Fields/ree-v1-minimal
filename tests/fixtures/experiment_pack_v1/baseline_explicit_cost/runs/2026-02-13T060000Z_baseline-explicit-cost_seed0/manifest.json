@@ -1,0 +1,44 @@
+{
+  "schema_version": "experiment_pack/v1",
+  "experiment_type": "baseline_explicit_cost",
+  "run_id": "2026-02-13T060000Z_baseline-explicit-cost_seed0",
+  "status": "PASS",
+  "timestamp_utc": "2026-02-13T06:00:00Z",
+  "source_repo": {
+    "name": "ree-v1-minimal",
+    "commit": "1111111111111111111111111111111111111111",
+    "branch": "main"
+  },
+  "runner": {
+    "name": "ree-v1-minimal-harness",
+    "version": "0.1.0"
+  },
+  "scenario": {
+    "name": "baseline_explicit_cost",
+    "seed": 0,
+    "config_hash": "cfg_fixture_001"
+  },
+  "stop_criteria_version": "stop_criteria/v1",
+  "claim_ids_tested": ["MECH-056", "Q-011"],
+  "evidence_class": "simulation",
+  "evidence_direction": "supports",
+  "producer_capabilities": {
+    "trajectory_integrity_channelized_bias": true,
+    "mech056_dispatch_metric_set": true,
+    "mech056_summary_escalation_trace": true
+  },
+  "environment": {
+    "env_id": "ree.grid_world",
+    "env_version": "grid_world/v1",
+    "dynamics_hash": "dyn_fixture_001",
+    "reward_hash": "rew_fixture_001",
+    "observation_hash": "obs_fixture_001",
+    "config_hash": "cfg_env_fixture_001",
+    "tier": "toy"
+  },
+  "failure_signatures": [],
+  "artifacts": {
+    "metrics_path": "metrics.json",
+    "summary_path": "summary.md"
+  }
+}
