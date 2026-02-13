@@ -28,6 +28,29 @@ METRICS_SCHEMA_VERSION = "experiment_pack_metrics/v1"
 STOP_CRITERIA_VERSION = "stop_criteria/v1"
 OUTPUT_ROOT_ENV = "REE_EXPERIMENT_OUTPUT_ROOT"
 EVIDENCE_DIRECTIONS = {"supports", "weakens", "mixed", "unknown"}
+REQUIRED_ENVIRONMENT_FIELDS = (
+    "env_id",
+    "env_version",
+    "dynamics_hash",
+    "reward_hash",
+    "observation_hash",
+    "config_hash",
+    "tier",
+)
+DEFAULT_PRODUCER_CAPABILITIES = {
+    "trajectory_integrity_channelized_bias": True,
+    "mech056_dispatch_metric_set": True,
+    "mech056_summary_escalation_trace": True,
+}
+DEFAULT_ENVIRONMENT = {
+    "env_id": "ree.unknown",
+    "env_version": "unknown",
+    "dynamics_hash": "unknown",
+    "reward_hash": "unknown",
+    "observation_hash": "unknown",
+    "config_hash": "unknown",
+    "tier": "unknown",
+}
 
 _SNAKE_CASE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 _EXPERIMENT_SLUG_RE = re.compile(r"[^a-z0-9]+")
@@ -137,6 +160,8 @@ class ExperimentPackWriter:
         claim_ids_tested: Optional[list[str]] = None,
         evidence_class: Optional[str] = None,
         evidence_direction: Optional[str] = None,
+        producer_capabilities: Optional[Mapping[str, bool]] = None,
+        environment: Optional[Mapping[str, Any]] = None,
         traces_dir: Optional[str] = None,
         media_dir: Optional[str] = None,
     ) -> EmittedPack:
@@ -149,6 +174,8 @@ class ExperimentPackWriter:
         clean_claim_ids = _clean_claim_ids(claim_ids_tested or [])
         clean_evidence_class = _clean_evidence_class(evidence_class)
         clean_evidence_direction = _clean_evidence_direction(evidence_direction)
+        clean_producer_capabilities = _clean_producer_capabilities(producer_capabilities)
+        clean_environment = _clean_environment(environment)
 
         run_dir = self.output_root / experiment_type / "runs" / run_id
         run_dir.mkdir(parents=True, exist_ok=False)
@@ -191,6 +218,8 @@ class ExperimentPackWriter:
             "claim_ids_tested": clean_claim_ids,
             "evidence_class": clean_evidence_class,
             "evidence_direction": clean_evidence_direction,
+            "producer_capabilities": clean_producer_capabilities,
+            "environment": clean_environment,
         }
 
         if scenario:
@@ -254,6 +283,36 @@ def _clean_evidence_direction(evidence_direction: Optional[str]) -> str:
             f"invalid evidence_direction '{evidence_direction}' (expected one of: {expected})"
         )
     return cleaned
+
+
+def _clean_producer_capabilities(
+    producer_capabilities: Optional[Mapping[str, bool]],
+) -> dict[str, bool]:
+    clean = dict(DEFAULT_PRODUCER_CAPABILITIES)
+    if producer_capabilities is None:
+        return clean
+
+    for key, value in producer_capabilities.items():
+        if not isinstance(key, str) or not key.strip():
+            raise ValueError("producer capability keys must be non-empty strings")
+        if not isinstance(value, bool):
+            raise TypeError(f"producer capability '{key}' must be a boolean")
+        clean[key] = value
+    return clean
+
+
+def _clean_environment(environment: Optional[Mapping[str, Any]]) -> dict[str, str]:
+    clean = dict(DEFAULT_ENVIRONMENT)
+    if environment is not None:
+        for key, value in environment.items():
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError("environment keys must be non-empty strings")
+            clean[key] = str(value).strip() if value is not None else "unknown"
+
+    for key in REQUIRED_ENVIRONMENT_FIELDS:
+        value = clean.get(key, "").strip()
+        clean[key] = value if value else "unknown"
+    return clean
 
 
 def _coerce_numeric(value: Any) -> Union[float, int]:

@@ -29,6 +29,27 @@ FIXTURE_RUN_DIR = (
     / "2026-02-13T060000Z_baseline-explicit-cost_seed0"
 )
 SNAKE_CASE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+REQUIRED_ENVIRONMENT_FIELDS = (
+    "env_id",
+    "env_version",
+    "dynamics_hash",
+    "reward_hash",
+    "observation_hash",
+    "config_hash",
+    "tier",
+)
+MECH056_REQUIRED_METRICS = (
+    "trajectory_commit_channel_usage_count",
+    "perceptual_sampling_channel_usage_count",
+    "structural_consolidation_channel_usage_count",
+    "precommit_semantic_overwrite_events",
+    "structural_bias_magnitude",
+    "structural_bias_rate",
+    "environment_shortcut_leakage_events",
+    "environment_unobservable_critical_state_rate",
+    "environment_controllability_score",
+    "environment_transition_consistency_rate",
+)
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -135,6 +156,25 @@ def _assert_schema_valid_pack(run_dir: Path) -> None:
 
     assert manifest.get("evidence_direction") in EVIDENCE_DIRECTIONS
 
+    assert isinstance(manifest.get("producer_capabilities"), dict)
+    assert manifest["producer_capabilities"], "producer_capabilities must not be empty"
+    assert all(isinstance(v, bool) for v in manifest["producer_capabilities"].values())
+
+    assert isinstance(manifest.get("environment"), dict)
+    for field in REQUIRED_ENVIRONMENT_FIELDS:
+        assert field in manifest["environment"]
+        assert isinstance(manifest["environment"][field], str)
+        assert manifest["environment"][field].strip()
+
+    if "MECH-056" in manifest["claim_ids_tested"]:
+        for key in MECH056_REQUIRED_METRICS:
+            assert key in values, f"missing MECH-056 required metric {key}"
+        assert "channel_escalation_order_observed" in summary_text
+        if int(values["perceptual_sampling_channel_usage_count"]) > 0:
+            assert "trigger_rationale_perceptual_sampling" in summary_text
+        if int(values["structural_consolidation_channel_usage_count"]) > 0:
+            assert "trigger_rationale_structural_consolidation" in summary_text
+
 
 def test_deterministic_run_id() -> None:
     ts = normalize_timestamp_utc("2026-02-13T06:00:00Z")
@@ -160,13 +200,44 @@ def test_writer_emits_contract_shape(tmp_path: Path) -> None:
             "final_residue": 0.42,
             "steps_survived": 12,
             "fatal_error_count": 0,
+            "trajectory_commit_channel_usage_count": 12,
+            "perceptual_sampling_channel_usage_count": 2,
+            "structural_consolidation_channel_usage_count": 1,
+            "precommit_semantic_overwrite_events": 0,
+            "structural_bias_magnitude": 0.42,
+            "structural_bias_rate": 0.035,
+            "environment_shortcut_leakage_events": 0,
+            "environment_unobservable_critical_state_rate": 0.0,
+            "environment_controllability_score": 0.75,
+            "environment_transition_consistency_rate": 0.98,
         },
-        summary_markdown="# Summary\n\nAll checks passed.",
+        summary_markdown=(
+            "# Summary\n\n"
+            "All checks passed.\n\n"
+            "## MECH-056 Escalation Trace\n"
+            "- channel_escalation_order_observed: `trajectory_commit -> perceptual_sampling -> structural_consolidation`\n"
+            "- trigger_rationale_perceptual_sampling: activated due to elevated risk.\n"
+            "- trigger_rationale_structural_consolidation: activated due to persistent bias."
+        ),
         scenario={"name": "baseline_explicit_cost", "seed": 0, "config_hash": "abc123"},
         failure_signatures=[],
         claim_ids_tested=["MECH-056", "Q-011"],
         evidence_class="simulation",
         evidence_direction="supports",
+        producer_capabilities={
+            "trajectory_integrity_channelized_bias": True,
+            "mech056_dispatch_metric_set": True,
+            "mech056_summary_escalation_trace": True,
+        },
+        environment={
+            "env_id": "ree.grid_world",
+            "env_version": "grid_world/v1",
+            "dynamics_hash": "d1",
+            "reward_hash": "r1",
+            "observation_hash": "o1",
+            "config_hash": "c1",
+            "tier": "toy",
+        },
     )
 
     assert emitted.run_dir.exists()

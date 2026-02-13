@@ -13,6 +13,16 @@
     "hazard_event_count": 0,
     "collision_event_count": 0,
     "resource_event_count": 3,
-    "fatal_error_count": 0
+    "fatal_error_count": 0,
+    "trajectory_commit_channel_usage_count": 25,
+    "perceptual_sampling_channel_usage_count": 2,
+    "structural_consolidation_channel_usage_count": 1,
+    "precommit_semantic_overwrite_events": 0,
+    "structural_bias_magnitude": 0.08,
+    "structural_bias_rate": 0.0032,
+    "environment_shortcut_leakage_events": 0,
+    "environment_unobservable_critical_state_rate": 0.0,
+    "environment_controllability_score": 0.8,
+    "environment_transition_consistency_rate": 0.98
   }
 }

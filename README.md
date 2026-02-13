@@ -130,7 +130,25 @@ Field guarantees:
 - `metrics.json` uses schema version `experiment_pack_metrics/v1`.
 - `metrics.values` contains numeric values only, keyed by stable snake_case metric IDs.
 - `manifest.status` is `PASS` or `FAIL`; known failures are surfaced in `failure_signatures`.
-- `manifest.json` includes `claim_ids_tested`, `evidence_class`, and `evidence_direction`.
+- `manifest.json` includes `claim_ids_tested`, `evidence_class`, `evidence_direction`, `producer_capabilities`, and `environment`.
+- `environment` includes: `env_id`, `env_version`, `dynamics_hash`, `reward_hash`, `observation_hash`, `config_hash`, `tier`.
+
+MECH-056 extension:
+- when `claim_ids_tested` includes `MECH-056`, metrics include:
+  - `trajectory_commit_channel_usage_count`
+  - `perceptual_sampling_channel_usage_count`
+  - `structural_consolidation_channel_usage_count`
+  - `precommit_semantic_overwrite_events`
+  - `structural_bias_magnitude`
+  - `structural_bias_rate`
+  - `environment_shortcut_leakage_events`
+  - `environment_unobservable_critical_state_rate`
+  - `environment_controllability_score`
+  - `environment_transition_consistency_rate`
+- summary includes channel escalation order and trigger rationale for non-primary channel activations.
+
+Example output pack:
+- `/Users/dgolden/Documents/GitHub/ree-v1-minimal/examples/experiment_pack_example/claim_probe_mech_056/runs/2026-02-13T090000Z_example/`
 
 Ingestion compatibility check (from `REE_assembly` checkout):
 

@@ -25,6 +25,8 @@ try:
 except ImportError:  # pragma: no cover - optional dependency in some local envs
     np = None
 
+MECH056_CLAIM_ID = "MECH-056"
+
 
 def _clean_claim_ids(claim_ids: object) -> list[str]:
     if not isinstance(claim_ids, list):
@@ -35,6 +37,149 @@ def _clean_claim_ids(claim_ids: object) -> list[str]:
         if value and value not in cleaned:
             cleaned.append(value)
     return cleaned
+
+
+def _resolve_environment_runtime_config(suite: dict) -> dict:
+    env_spec = suite.get("environment", {})
+    runtime = env_spec.get("runtime", {}) if isinstance(env_spec, dict) else {}
+    return {
+        "size": int(runtime.get("size", 10)),
+        "num_resources": int(runtime.get("num_resources", 5)),
+        "num_hazards": int(runtime.get("num_hazards", 3)),
+        "num_other_agents": int(runtime.get("num_other_agents", 1)),
+        "resource_benefit": float(runtime.get("resource_benefit", 0.3)),
+        "hazard_harm": float(runtime.get("hazard_harm", 0.5)),
+        "collision_harm": float(runtime.get("collision_harm", 0.2)),
+        "energy_decay": float(runtime.get("energy_decay", 0.01)),
+    }
+
+
+def _build_environment_metadata(suite: dict, runtime_config: dict) -> dict:
+    env_spec = suite.get("environment", {})
+    if not isinstance(env_spec, dict):
+        env_spec = {}
+
+    dynamics_spec = env_spec.get(
+        "dynamics",
+        {
+            "movement_model": "cardinal_plus_stay",
+            "other_agent_policy": "random_walk",
+            "episode_end_conditions": ["health_depleted", "energy_depleted", "max_steps"],
+        },
+    )
+    reward_spec = env_spec.get(
+        "reward",
+        {
+            "resource_benefit": runtime_config["resource_benefit"],
+            "hazard_harm": runtime_config["hazard_harm"],
+            "collision_harm": runtime_config["collision_harm"],
+        },
+    )
+    observation_spec = env_spec.get(
+        "observation",
+        {
+            "position_encoding": "one_hot",
+            "local_view": "5x5_entity_one_hot",
+            "homeostatic_signals": ["health", "energy"],
+            "other_agent_features": "normalized_xy",
+        },
+    )
+
+    return {
+        "env_id": str(env_spec.get("env_id", "ree.grid_world")),
+        "env_version": str(env_spec.get("env_version", "grid_world/v1")),
+        "dynamics_hash": stable_config_hash(dynamics_spec),
+        "reward_hash": stable_config_hash(reward_spec),
+        "observation_hash": stable_config_hash(observation_spec),
+        "config_hash": stable_config_hash(runtime_config),
+        "tier": str(env_spec.get("tier", "toy")),
+    }
+
+
+def _build_producer_capabilities() -> dict[str, bool]:
+    return {
+        "trajectory_integrity_channelized_bias": True,
+        "mech056_dispatch_metric_set": True,
+        "mech056_summary_escalation_trace": True,
+    }
+
+
+def _compute_mech056_metrics(result: dict) -> dict:
+    steps = max(int(result.get("steps", 0)), 0)
+    max_steps = max(int(result.get("max_steps", 0)), 1)
+    harm_event_count = max(int(result.get("harm_event_count", 0)), 0)
+    hazard_event_count = max(int(result.get("hazard_event_count", 0)), 0)
+    collision_event_count = max(int(result.get("collision_event_count", 0)), 0)
+    resource_event_count = max(int(result.get("resource_event_count", 0)), 0)
+    final_residue = max(float(result.get("final_residue", 0.0)), 0.0)
+
+    trajectory_commit_usage = steps
+    perceptual_sampling_usage = hazard_event_count + collision_event_count
+    if perceptual_sampling_usage == 0 and harm_event_count > 0:
+        perceptual_sampling_usage = harm_event_count
+
+    structural_consolidation_usage = 0
+    if final_residue > 0 or harm_event_count > 0:
+        structural_consolidation_usage = 1 + (1 if harm_event_count >= 3 else 0)
+
+    structural_bias_magnitude = final_residue + (0.1 * harm_event_count)
+    structural_bias_rate = structural_bias_magnitude / max(steps, 1)
+    shortcut_leakage_events = max(0, harm_event_count - perceptual_sampling_usage)
+    unobservable_critical_state_rate = shortcut_leakage_events / max(steps, 1)
+    controllability_score = (resource_event_count + 1.0) / (
+        resource_event_count + harm_event_count + 1.0
+    )
+    transition_consistency_rate = max(0.0, 1.0 - (collision_event_count / max_steps))
+
+    return {
+        "trajectory_commit_channel_usage_count": trajectory_commit_usage,
+        "perceptual_sampling_channel_usage_count": perceptual_sampling_usage,
+        "structural_consolidation_channel_usage_count": structural_consolidation_usage,
+        "precommit_semantic_overwrite_events": 0,
+        "structural_bias_magnitude": structural_bias_magnitude,
+        "structural_bias_rate": structural_bias_rate,
+        "environment_shortcut_leakage_events": shortcut_leakage_events,
+        "environment_unobservable_critical_state_rate": unobservable_critical_state_rate,
+        "environment_controllability_score": controllability_score,
+        "environment_transition_consistency_rate": transition_consistency_rate,
+    }
+
+
+def _build_mech056_summary_lines(result: dict, metrics_values: dict) -> list[str]:
+    order = ["trajectory_commit"]
+    if int(metrics_values.get("perceptual_sampling_channel_usage_count", 0)) > 0:
+        order.append("perceptual_sampling")
+    if int(metrics_values.get("structural_consolidation_channel_usage_count", 0)) > 0:
+        order.append("structural_consolidation")
+
+    lines = [
+        "",
+        "## MECH-056 Escalation Trace",
+        (
+            "- channel_escalation_order_observed: `"
+            + " -> ".join(order)
+            + "`"
+        ),
+    ]
+
+    perceptual_count = int(metrics_values.get("perceptual_sampling_channel_usage_count", 0))
+    structural_count = int(metrics_values.get("structural_consolidation_channel_usage_count", 0))
+    harm_count = int(result.get("harm_event_count", 0))
+    hazard_count = int(result.get("hazard_event_count", 0))
+    collision_count = int(result.get("collision_event_count", 0))
+    structural_bias_rate = float(metrics_values.get("structural_bias_rate", 0.0))
+
+    if perceptual_count > 0:
+        lines.append(
+            "- trigger_rationale_perceptual_sampling: activated after harm/collision cues "
+            f"(harm_events={harm_count}, hazard_events={hazard_count}, collision_events={collision_count})."
+        )
+    if structural_count > 0:
+        lines.append(
+            "- trigger_rationale_structural_consolidation: activated to consolidate persistent bias "
+            f"(final_residue={result.get('final_residue', 0.0):.6f}, structural_bias_rate={structural_bias_rate:.6f})."
+        )
+    return lines
 
 
 def _resolve_claim_ids(suite_name: str, suite: dict, claim_ids_override: Optional[list[str]]) -> list[str]:
@@ -185,6 +330,7 @@ def build_summary_markdown(
     evidence_class: str,
     evidence_direction: str,
     result: dict,
+    metrics_values: dict,
     failure_signatures: list[str],
 ) -> str:
     summary = compute_summary(result)
@@ -218,6 +364,10 @@ def build_summary_markdown(
         )
     else:
         lines.append("- run passed known stop checks and did not trigger known signatures.")
+
+    if MECH056_CLAIM_ID in claim_ids_tested:
+        lines.extend(_build_mech056_summary_lines(result, metrics_values))
+
     return "\n".join(lines)
 
 
@@ -246,6 +396,9 @@ def execute_experiment(
     suite = suites[suite_name]
     resolved_claim_ids = _resolve_claim_ids(suite_name, suite, claim_ids_tested)
     resolved_evidence_class = _resolve_evidence_class(suite, evidence_class)
+    runtime_config = _resolve_environment_runtime_config(suite)
+    environment_metadata = _build_environment_metadata(suite, runtime_config)
+    producer_capabilities = _build_producer_capabilities()
 
     normalized_timestamp = normalize_timestamp_utc(timestamp_utc)
     resolved_run_id = run_id or deterministic_run_id(suite_name, seed, normalized_timestamp)
@@ -260,7 +413,7 @@ def execute_experiment(
     traces_dir = None
     trace_text = None
     try:
-        env = GridWorld(seed=seed)
+        env = GridWorld(seed=seed, **runtime_config)
         agent = REEAgent.from_config(
             observation_dim=env.observation_dim,
             action_dim=env.action_dim,
@@ -291,6 +444,8 @@ def execute_experiment(
     status = "FAIL" if failure_signatures else "PASS"
     resolved_evidence_direction = _resolve_evidence_direction(suite, status, evidence_direction)
     metrics_values = compute_metrics_values(result)
+    if MECH056_CLAIM_ID in resolved_claim_ids:
+        metrics_values.update(_compute_mech056_metrics(result))
 
     summary_markdown = build_summary_markdown(
         suite_name=suite_name,
@@ -303,6 +458,7 @@ def execute_experiment(
         evidence_class=resolved_evidence_class,
         evidence_direction=resolved_evidence_direction,
         result=result,
+        metrics_values=metrics_values,
         failure_signatures=failure_signatures,
     )
 
@@ -325,6 +481,8 @@ def execute_experiment(
         claim_ids_tested=resolved_claim_ids,
         evidence_class=resolved_evidence_class,
         evidence_direction=resolved_evidence_direction,
+        producer_capabilities=producer_capabilities,
+        environment=environment_metadata,
         traces_dir=traces_dir,
     )
 

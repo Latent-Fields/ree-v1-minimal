@@ -1,0 +1,28 @@
+{
+  "schema_version": "experiment_pack_metrics/v1",
+  "values": {
+    "total_harm": 0.35,
+    "total_reward": 1.1,
+    "final_residue": 0.42,
+    "steps_survived": 42,
+    "max_steps": 50,
+    "done": 1,
+    "final_health": 0.71,
+    "final_energy": 0.44,
+    "harm_event_count": 2,
+    "hazard_event_count": 1,
+    "collision_event_count": 1,
+    "resource_event_count": 3,
+    "fatal_error_count": 0,
+    "trajectory_commit_channel_usage_count": 42,
+    "perceptual_sampling_channel_usage_count": 2,
+    "structural_consolidation_channel_usage_count": 1,
+    "precommit_semantic_overwrite_events": 0,
+    "structural_bias_magnitude": 0.62,
+    "structural_bias_rate": 0.014762,
+    "environment_shortcut_leakage_events": 0,
+    "environment_unobservable_critical_state_rate": 0.0,
+    "environment_controllability_score": 0.666667,
+    "environment_transition_consistency_rate": 0.98
+  }
+}

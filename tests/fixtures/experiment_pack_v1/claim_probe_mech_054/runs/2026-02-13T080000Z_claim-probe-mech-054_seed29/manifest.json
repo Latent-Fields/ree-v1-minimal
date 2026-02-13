@@ -23,6 +23,20 @@
   ],
   "evidence_class": "simulation",
   "evidence_direction": "supports",
+  "producer_capabilities": {
+    "trajectory_integrity_channelized_bias": true,
+    "mech056_dispatch_metric_set": true,
+    "mech056_summary_escalation_trace": true
+  },
+  "environment": {
+    "env_id": "ree.claim_probe_dispatch",
+    "env_version": "dispatch.v1",
+    "dynamics_hash": "dyn_claim_probe_dispatch",
+    "reward_hash": "rew_claim_probe_dispatch",
+    "observation_hash": "obs_claim_probe_dispatch",
+    "config_hash": "cfg_claim_probe_mech_054",
+    "tier": "stress"
+  },
   "scenario": {
     "name": "claim_probe_mech_054",
     "seed": 29,

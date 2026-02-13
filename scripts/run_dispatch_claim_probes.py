@@ -27,12 +27,44 @@ REQUIRED_EXPERIMENTS = ("claim_probe_mech_053", "claim_probe_mech_054")
 DEFAULT_SEEDS = (11, 29)
 RUNNER_NAME = "ree-v1-claim-probe-dispatch"
 RUNNER_VERSION = "dispatch.v1"
+PRODUCER_CAPABILITIES = {
+    "trajectory_integrity_channelized_bias": True,
+    "mech056_dispatch_metric_set": True,
+    "mech056_summary_escalation_trace": True,
+}
 
 
 def load_suites() -> dict[str, Any]:
     suites_path = Path("experiments/suites.json")
     with suites_path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def build_environment_metadata(suite: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, str]:
+    env_spec = suite.get("environment", {})
+    if not isinstance(env_spec, dict):
+        env_spec = {}
+    dynamics_spec = env_spec.get(
+        "dynamics",
+        {"transition_model": "stochastic_probe_dispatch", "policy": "seeded_rng"},
+    )
+    reward_spec = env_spec.get(
+        "reward",
+        {"objective": "claim_probe_threshold_eval"},
+    )
+    observation_spec = env_spec.get(
+        "observation",
+        {"interface": "synthetic_probe_channels"},
+    )
+    return {
+        "env_id": str(env_spec.get("env_id", "ree.claim_probe_dispatch")),
+        "env_version": str(env_spec.get("env_version", "dispatch.v1")),
+        "dynamics_hash": stable_config_hash(dynamics_spec),
+        "reward_hash": stable_config_hash(reward_spec),
+        "observation_hash": stable_config_hash(observation_spec),
+        "config_hash": stable_config_hash(config),
+        "tier": str(env_spec.get("tier", "stress")),
+    }
 
 
 def run_probe_mech_053(
@@ -227,6 +259,7 @@ def run_dispatch(
         evidence_class = str(suite.get("evidence_class", "simulation"))
         config = suite.get("probe_config", {})
         probe_type = suite.get("probe_type")
+        environment = build_environment_metadata(suite, config)
 
         for seed in seeds:
             run_id = deterministic_run_id(experiment, seed, normalized_ts)
@@ -276,6 +309,8 @@ def run_dispatch(
                 claim_ids_tested=claim_ids,
                 evidence_class=evidence_class,
                 evidence_direction=direction,
+                producer_capabilities=PRODUCER_CAPABILITIES,
+                environment=environment,
             )
 
             report_rows.append(

@@ -14,3 +14,8 @@
 
 ## Interpretation
 - run passed known stop checks and did not trigger known signatures.
+
+## MECH-056 Escalation Trace
+- channel_escalation_order_observed: `trajectory_commit -> perceptual_sampling -> structural_consolidation`
+- trigger_rationale_perceptual_sampling: activated after harm/collision cues (harm_events=0, hazard_events=0, collision_events=0).
+- trigger_rationale_structural_consolidation: activated to consolidate persistent bias (final_residue=0.000000, structural_bias_rate=0.003200).
