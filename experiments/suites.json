@@ -59,5 +59,27 @@
       "use_residue": true,
       "use_offline_integration": false
     }
+  },
+
+  "claim_probe_mech_053": {
+    "description": "Claim probe for MECH-053: aversive PE gate suppresses commitment under negative spikes.",
+    "claim_ids_tested": ["MECH-053"],
+    "evidence_class": "simulation",
+    "probe_type": "mech_053",
+    "probe_config": {
+      "num_trials": 240,
+      "spike_probability": 0.4
+    }
+  },
+
+  "claim_probe_mech_054": {
+    "description": "Claim probe for MECH-054: signed PE precision separates harm/benefit modulation.",
+    "claim_ids_tested": ["MECH-054"],
+    "evidence_class": "simulation",
+    "probe_type": "mech_054",
+    "probe_config": {
+      "num_events": 320,
+      "harm_event_probability": 0.45
+    }
   }
 }
