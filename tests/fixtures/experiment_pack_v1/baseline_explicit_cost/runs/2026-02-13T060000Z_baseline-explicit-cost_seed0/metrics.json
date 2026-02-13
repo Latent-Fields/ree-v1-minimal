@@ -1,0 +1,18 @@
+{
+  "schema_version": "experiment_pack_metrics/v1",
+  "values": {
+    "total_harm": 0.0,
+    "total_reward": 1.5,
+    "final_residue": 0.0,
+    "steps_survived": 25,
+    "max_steps": 25,
+    "done": 0,
+    "final_health": 1.0,
+    "final_energy": 0.75,
+    "harm_event_count": 0,
+    "hazard_event_count": 0,
+    "collision_event_count": 0,
+    "resource_event_count": 3,
+    "fatal_error_count": 0
+  }
+}
