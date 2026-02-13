@@ -122,6 +122,8 @@ def _validate_type(value: Any, expected_type: Any, path: str) -> None:
         assert isinstance(value, int) and not isinstance(value, bool), (
             f"{path} must be an integer"
         )
+    elif expected_type == "boolean":
+        assert isinstance(value, bool), f"{path} must be a boolean"
     else:
         raise AssertionError(f"unsupported schema type in tests: {expected_type!r}")
 
