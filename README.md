@@ -183,6 +183,29 @@ Contract update procedure:
 4. refresh fixture/example packs if required fields changed.
 5. run `EXPERIMENT_PACK_ROOT=tests/fixtures/experiment_pack_v1 python scripts/validate_experiment_packs.py`.
 
+Weekly producer handoff report (parity/backstop lane):
+- source template: `/Users/dgolden/Documents/GitHub/REE_assembly/evidence/planning/WEEKLY_HANDOFF_TEMPLATE.md`
+- current-cycle report path: `evidence/planning/weekly_handoff_current.md`
+- generate from latest bridging qualification runs:
+
+```bash
+python scripts/generate_weekly_handoff_report.py \
+  --run-root runs/bridging_qualification_056_058_059_060 \
+  --output evidence/planning/weekly_handoff_current.md
+```
+
+- validate required sections/columns:
+
+```bash
+python scripts/validate_weekly_handoff_report.py --report evidence/planning/weekly_handoff_current.md
+```
+
+- CI enforcement:
+  - workflow: `.github/workflows/validate-experiment-pack.yml`
+  - fails if weekly handoff report is missing required template sections/columns.
+  - fails if any run row is missing `evidence_direction` or `pack_path`.
+  - parity note should explicitly state agreement/disagreement with latest `ree-v2` outcomes, or mark unavailable this cycle.
+
 Ingestion compatibility check (from `REE_assembly` checkout):
 
 ```bash
