@@ -185,26 +185,26 @@ Contract update procedure:
 
 Weekly producer handoff report (parity/backstop lane):
 - source template: `/Users/dgolden/Documents/GitHub/REE_assembly/evidence/planning/WEEKLY_HANDOFF_TEMPLATE.md`
-- current-cycle report path: `evidence/planning/weekly_handoff_current.md`
+- current-cycle report path: `evidence/planning/weekly_handoff/latest.md`
 - generate from latest bridging qualification runs:
 
 ```bash
-python scripts/generate_weekly_handoff_report.py \
+python3 scripts/generate_weekly_handoff.py \
   --run-root runs/bridging_qualification_056_058_059_060 \
-  --output evidence/planning/weekly_handoff_current.md
+  --output evidence/planning/weekly_handoff/latest.md
 ```
 
 - validate required sections/columns:
 
 ```bash
-python scripts/validate_weekly_handoff_report.py --report evidence/planning/weekly_handoff_current.md
+python3 scripts/validate_weekly_handoff.py --input evidence/planning/weekly_handoff/latest.md
 ```
 
-- CI enforcement:
-  - workflow: `.github/workflows/validate-experiment-pack.yml`
-  - fails if weekly handoff report is missing required template sections/columns.
-  - fails if any run row is missing `evidence_direction` or `pack_path`.
-  - parity note should explicitly state agreement/disagreement with latest `ree-v2` outcomes, or mark unavailable this cycle.
+- deterministic generation behavior:
+  - rows are sorted by `experiment_type` then `run_id`.
+  - `generated_utc` defaults to max observed run timestamp unless overridden.
+  - parity note compares claim-summary directionality against latest `ree-v2` handoff when available; otherwise emits `N/A`.
+  - Local Compute Options Watch defaults to `N/A` for parity/backstop unless explicitly overridden.
 
 Ingestion compatibility check (from `REE_assembly` checkout):
 
