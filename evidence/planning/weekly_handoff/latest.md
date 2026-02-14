@@ -3,7 +3,7 @@
 ## Metadata
 - week_of_utc: `2026-02-09`
 - producer_repo: `ree-v1-minimal`
-- producer_commit: `7e5de4d660374cd829afe071e78a16b3c8a47fac`
+- producer_commit: `a1cb5fee15a9fc8845b0ae09fe8b76aee9de860e`
 - generated_utc: `2026-02-14T03:00:00Z`
 
 ## Contract Sync
@@ -48,10 +48,10 @@
 | MECH-058 | 4 | 2 | 2 | 0 | 0 | threshold:e1_e2_timescale_separation_ratio, threshold:latent_prediction_error_mean, threshold:latent_prediction_error_p95, threshold:latent_rollout_consistency_rate, threshold:representation_drift_rate |
 | MECH-059 | 4 | 2 | 2 | 0 | 0 | threshold:latent_prediction_error_mean, threshold:latent_uncertainty_calibration_error, threshold:precision_input_completeness_rate, threshold:uncertainty_coverage_rate |
 | MECH-060 | 4 | 2 | 2 | 0 | 0 | threshold:commitment_reversal_rate, threshold:cross_channel_leakage_rate, threshold:post_commit_error_attribution_gain, threshold:pre_commit_error_signal_to_noise |
+Parity note: Parity note vs latest ree-v2: disagreement on overlapping claims (MECH-056(ree-v1-minimal=mixed, ree-v2=supports), MECH-058(ree-v1-minimal=mixed, ree-v2=supports), MECH-059(ree-v1-minimal=mixed, ree-v2=supports), MECH-060(ree-v1-minimal=mixed, ree-v2=supports)); source=/Users/dgolden/Documents/GitHub/ree-v2/evidence/planning/weekly_handoff/latest.md.
 
 ## Open Blockers
-- Parity note vs latest ree-v2: disagreement on overlapping claims (MECH-056(ree-v1-minimal=mixed, ree-v2=supports), MECH-058(ree-v1-minimal=mixed, ree-v2=supports), MECH-059(ree-v1-minimal=mixed, ree-v2=supports), MECH-060(ree-v1-minimal=mixed, ree-v2=supports)); source=/Users/dgolden/Documents/GitHub/ree-v2/evidence/planning/weekly_handoff/latest.md.
-- No additional blockers reported this cycle.
+None.
 
 ## Local Compute Options Watch
 - local_options_last_updated_utc: `N/A`

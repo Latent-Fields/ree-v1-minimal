@@ -200,10 +200,13 @@ def main() -> int:
 
     blockers = section_lines(lines, "## Open Blockers")
     blocker_bullets = [line.strip() for line in blockers[1:] if line.strip().startswith("- ")]
-    if not blocker_bullets:
-        errors.append("Open Blockers: expected at least one bullet")
-    if not any("parity note" in bullet.lower() for bullet in blocker_bullets):
-        errors.append("Open Blockers: missing parity note bullet")
+    blocker_nonempty = [line.strip() for line in blockers[1:] if line.strip()]
+    if not blocker_bullets and not any(line.lower() in {"none.", "none", "n/a"} for line in blocker_nonempty):
+        errors.append("Open Blockers: expected blocker bullets or explicit 'None.'")
+
+    parity_present = any("parity note" in line.lower() for line in claim_section[1:] + blockers[1:])
+    if not parity_present:
+        errors.append("Missing parity note (must appear in Claim Summary or Open Blockers)")
 
     local_watch = section_lines(lines, "## Local Compute Options Watch")
     for key in LOCAL_WATCH_KEYS:

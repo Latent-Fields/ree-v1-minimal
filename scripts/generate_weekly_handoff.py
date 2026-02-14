@@ -468,13 +468,13 @@ def main() -> int:
             f"| {claim_id} | {summary['runs_added']} | {summary['supports']} | "
             f"{summary['weakens']} | {summary['mixed']} | {summary['unknown']} | {recurring_joined} |"
         )
+    lines.append(f"Parity note: {parity_note}")
     lines.append("")
     lines.append("## Open Blockers")
-    lines.append(f"- {parity_note}")
     for blocker in args.blocker:
         lines.append(f"- {blocker}")
     if not args.blocker:
-        lines.append("- No additional blockers reported this cycle.")
+        lines.append("None.")
     lines.append("")
     lines.append("## Local Compute Options Watch")
     lines.append("- local_options_last_updated_utc: `N/A`")
