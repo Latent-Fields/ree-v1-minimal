@@ -15,6 +15,7 @@ REQUIRED_SECTIONS = [
     "## CI Gates",
     "## Run-Pack Inventory",
     "## Claim Summary",
+    "## Parity Delta Summary vs ree-v2",
     "## Open Blockers",
     "## Local Compute Options Watch",
 ]
@@ -65,6 +66,15 @@ CLAIM_SUMMARY_COLUMNS = [
     "unknown",
     "recurring_failure_signatures",
 ]
+
+PARITY_DELTA_COLUMNS = [
+    "claim_id",
+    "ree_v1_minimal_direction",
+    "ree_v2_direction",
+    "reason",
+]
+
+REQUIRED_PARITY_CLAIMS = {"MECH-056", "MECH-058", "MECH-059", "MECH-060"}
 
 LOCAL_WATCH_KEYS = [
     "local_options_last_updated_utc",
@@ -197,6 +207,38 @@ def main() -> int:
     else:
         if claim_rows[0] != CLAIM_SUMMARY_COLUMNS:
             errors.append("Claim Summary: required columns missing or reordered")
+
+    parity_section = section_lines(lines, "## Parity Delta Summary vs ree-v2")
+    parity_rows = extract_table(parity_section)
+    if len(parity_rows) < 3:
+        errors.append("Parity Delta Summary vs ree-v2: missing rows")
+    else:
+        if parity_rows[0] != PARITY_DELTA_COLUMNS:
+            errors.append("Parity Delta Summary vs ree-v2: required columns missing or reordered")
+        seen_claims: set[str] = set()
+        for index, row in enumerate(parity_rows[2:], start=1):
+            if len(row) != len(PARITY_DELTA_COLUMNS):
+                errors.append(f"Parity Delta Summary vs ree-v2: row {index} has wrong column count")
+                continue
+            data = dict(zip(PARITY_DELTA_COLUMNS, row))
+            claim_id = data["claim_id"]
+            seen_claims.add(claim_id)
+            v1_direction = data["ree_v1_minimal_direction"]
+            if v1_direction not in VALID_DIRECTIONS:
+                errors.append(
+                    "Parity Delta Summary vs ree-v2: row "
+                    f"{index} invalid ree_v1_minimal_direction '{v1_direction}'"
+                )
+            v2_direction = data["ree_v2_direction"]
+            if v2_direction not in VALID_DIRECTIONS:
+                errors.append(
+                    f"Parity Delta Summary vs ree-v2: row {index} invalid ree_v2_direction '{v2_direction}'"
+                )
+            if not data["reason"]:
+                errors.append(f"Parity Delta Summary vs ree-v2: row {index} missing reason")
+        missing_claims = REQUIRED_PARITY_CLAIMS - seen_claims
+        for claim_id in sorted(missing_claims):
+            errors.append(f"Parity Delta Summary vs ree-v2: missing claim row '{claim_id}'")
 
     blockers = section_lines(lines, "## Open Blockers")
     blocker_bullets = [line.strip() for line in blockers[1:] if line.strip().startswith("- ")]

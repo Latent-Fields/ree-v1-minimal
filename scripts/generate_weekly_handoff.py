@@ -16,6 +16,7 @@ from typing import Any
 
 
 REQUIRED_DIRECTIONS = ("supports", "weakens", "mixed", "unknown")
+PARITY_CLAIMS = ("MECH-056", "MECH-058", "MECH-059", "MECH-060")
 
 
 def load_json(path: Path) -> Any:
@@ -38,6 +39,16 @@ def parse_rfc3339_utc(raw: str) -> datetime:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed.astimezone(timezone.utc)
+
+
+def parse_manifest_timestamp(manifest: dict[str, Any]) -> datetime | None:
+    raw = str(manifest.get("timestamp_utc", "")).strip()
+    if not raw:
+        return None
+    try:
+        return parse_rfc3339_utc(raw)
+    except ValueError:
+        return None
 
 
 def format_rfc3339_utc(value: datetime) -> str:
@@ -131,45 +142,66 @@ def dominant_direction(counts: dict[str, int]) -> str:
     return winners[0]
 
 
-def build_parity_note(local_claims: dict[str, dict[str, Any]], ree_v2_handoff: Path) -> str:
-    if not ree_v2_handoff.exists():
-        return f"Parity note vs latest ree-v2: N/A (missing {ree_v2_handoff})."
+def build_parity_delta(
+    local_claims: dict[str, dict[str, Any]], ree_v2_handoff: Path
+) -> tuple[list[dict[str, str]], str]:
+    remote_claims: dict[str, dict[str, int]] | None = None
+    if ree_v2_handoff.exists():
+        parsed = parse_claim_summary_from_handoff(ree_v2_handoff)
+        if parsed:
+            remote_claims = parsed
 
-    remote_claims = parse_claim_summary_from_handoff(ree_v2_handoff)
-    if not remote_claims:
-        return f"Parity note vs latest ree-v2: N/A (unable to parse claim summary in {ree_v2_handoff})."
-
-    overlap = sorted(set(local_claims) & set(remote_claims))
-    if not overlap:
-        return f"Parity note vs latest ree-v2: N/A (no overlapping claims in {ree_v2_handoff})."
-
-    agrees: list[str] = []
-    disagrees: list[str] = []
-    for claim_id in overlap:
-        local_direction = dominant_direction(local_claims[claim_id])
-        remote_direction = dominant_direction(remote_claims[claim_id])
-        if local_direction == remote_direction:
-            agrees.append(f"{claim_id}:{local_direction}")
+    rows: list[dict[str, str]] = []
+    for claim_id in PARITY_CLAIMS:
+        local_raw = local_claims.get(claim_id)
+        if local_raw is None:
+            local_direction = "unknown"
         else:
-            disagrees.append(
-                f"{claim_id}(ree-v1-minimal={local_direction}, ree-v2={remote_direction})"
-            )
+            local_direction = dominant_direction(local_raw)
 
-    if not disagrees:
-        return (
-            "Parity note vs latest ree-v2: agrees on overlapping claims "
-            f"({', '.join(agrees)}); source={ree_v2_handoff}."
+        if remote_claims is None:
+            remote_direction = "unknown"
+            reason = "N/A: latest ree-v2 handoff unavailable or unparsable."
+        elif claim_id not in remote_claims:
+            remote_direction = "unknown"
+            reason = "N/A: claim missing in latest ree-v2 handoff."
+        else:
+            remote_direction = dominant_direction(remote_claims[claim_id])
+            if local_direction == remote_direction:
+                reason = "Aligned dominant direction."
+            else:
+                reason = (
+                    "Direction mismatch: ree-v1-minimal includes matched positive/ablated "
+                    "condition pairs, producing split outcomes."
+                )
+
+        rows.append(
+            {
+                "claim_id": claim_id,
+                "ree_v1_direction": local_direction,
+                "ree_v2_direction": remote_direction,
+                "reason": reason,
+            }
         )
-    if not agrees:
-        return (
-            "Parity note vs latest ree-v2: disagreement on overlapping claims "
-            f"({', '.join(disagrees)}); source={ree_v2_handoff}."
+
+    if remote_claims is None:
+        note = f"Parity note vs latest ree-v2: N/A (source unavailable: {ree_v2_handoff})."
+        return rows, note
+
+    mismatches = [r for r in rows if r["ree_v2_direction"] != "unknown" and r["ree_v1_direction"] != r["ree_v2_direction"]]
+    if mismatches:
+        desc = ", ".join(
+            f"{r['claim_id']}({r['ree_v1_direction']} vs {r['ree_v2_direction']})" for r in mismatches
         )
-    return (
-        "Parity note vs latest ree-v2: agrees on "
-        f"({', '.join(agrees)}), disagrees on ({', '.join(disagrees)}); "
-        f"source={ree_v2_handoff}."
-    )
+        note = f"Parity note vs latest ree-v2: mismatch on {desc}; source={ree_v2_handoff}."
+    else:
+        covered = [r for r in rows if r["ree_v2_direction"] != "unknown"]
+        if covered:
+            desc = ", ".join(f"{r['claim_id']}:{r['ree_v1_direction']}" for r in covered)
+            note = f"Parity note vs latest ree-v2: aligned on {desc}; source={ree_v2_handoff}."
+        else:
+            note = f"Parity note vs latest ree-v2: N/A (no overlapping claims in {ree_v2_handoff})."
+    return rows, note
 
 
 def parse_args() -> argparse.Namespace:
@@ -217,8 +249,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--seed-determinism-evidence",
         default=(
-            "python scripts/check_bridging_seed_determinism.py --seeds 11,29 "
-            "--timestamp-utc 2026-02-14T03:00:00Z"
+            "python scripts/check_bridging_seed_determinism.py --seeds 11,29,47 "
+            "--timestamp-utc 2026-02-14T20:00:00Z"
         ),
         help="seed_determinism gate evidence string.",
     )
@@ -275,10 +307,24 @@ def main() -> int:
     output_path = (repo_root / args.output).resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    manifests = sorted(run_root.glob("*/runs/*/manifest.json"))
-    if not manifests:
+    manifest_paths = sorted(run_root.glob("*/runs/*/manifest.json"))
+    if not manifest_paths:
         print(f"FAIL: no manifest.json files under {run_root}")
         return 1
+
+    manifest_docs: list[tuple[Path, dict[str, Any], datetime | None]] = []
+    for manifest_path in manifest_paths:
+        manifest = load_json(manifest_path)
+        manifest_docs.append((manifest_path, manifest, parse_manifest_timestamp(manifest)))
+
+    parsed_timestamps = [ts for _, _, ts in manifest_docs if ts is not None]
+    latest_cycle_timestamp = max(parsed_timestamps) if parsed_timestamps else None
+    if latest_cycle_timestamp is not None:
+        manifest_docs = [
+            (path, manifest, ts)
+            for path, manifest, ts in manifest_docs
+            if ts is not None and ts == latest_cycle_timestamp
+        ]
 
     lock_path = repo_root / "contracts/ree_assembly_contract_lock.v1.json"
     if not lock_path.exists():
@@ -301,8 +347,7 @@ def main() -> int:
     observed_timestamps: list[datetime] = []
     schema_versions: set[str] = set()
 
-    for manifest_path in manifests:
-        manifest = load_json(manifest_path)
+    for manifest_path, manifest, parsed_timestamp in manifest_docs:
         run_dir = manifest_path.parent
         artifacts = manifest.get("artifacts", {})
 
@@ -334,12 +379,8 @@ def main() -> int:
                 if adapter_version:
                     schema_versions.add(adapter_version)
 
-        timestamp_raw = str(manifest.get("timestamp_utc", "")).strip()
-        if timestamp_raw:
-            try:
-                observed_timestamps.append(parse_rfc3339_utc(timestamp_raw))
-            except ValueError:
-                pass
+        if parsed_timestamp is not None:
+            observed_timestamps.append(parsed_timestamp)
 
         run_id = str(manifest.get("run_id", run_dir.name))
         claim_ids = manifest.get("claim_ids_tested", [])
@@ -383,6 +424,8 @@ def main() -> int:
 
     if args.generated_utc:
         generated_dt = parse_rfc3339_utc(args.generated_utc)
+    elif latest_cycle_timestamp is not None:
+        generated_dt = latest_cycle_timestamp
     elif observed_timestamps:
         generated_dt = max(observed_timestamps)
     else:
@@ -398,10 +441,8 @@ def main() -> int:
     producer_commit = git_value(repo_root, "rev-parse", "HEAD")
     schema_version_set = ", ".join(sorted(schema_versions))
 
-    if args.parity_note:
-        parity_note = args.parity_note
-    else:
-        parity_note = build_parity_note(claim_summary, Path(args.ree_v2_handoff))
+    parity_rows, computed_parity_note = build_parity_delta(claim_summary, Path(args.ree_v2_handoff))
+    parity_note = args.parity_note if args.parity_note else computed_parity_note
 
     lines: list[str] = []
     lines.append(f"# Weekly Handoff - {producer_repo} - {week_of_utc}")
@@ -470,10 +511,27 @@ def main() -> int:
         )
     lines.append(f"Parity note: {parity_note}")
     lines.append("")
+    lines.append("## Parity Delta Summary vs ree-v2")
+    lines.append("| claim_id | ree_v1_minimal_direction | ree_v2_direction | reason |")
+    lines.append("| --- | --- | --- | --- |")
+    for row in parity_rows:
+        lines.append(
+            f"| {row['claim_id']} | {row['ree_v1_direction']} | {row['ree_v2_direction']} | {row['reason']} |"
+        )
+    lines.append("")
     lines.append("## Open Blockers")
+    parity_mismatches = [
+        row for row in parity_rows if row["ree_v2_direction"] != "unknown" and row["ree_v1_direction"] != row["ree_v2_direction"]
+    ]
+    if parity_mismatches:
+        mismatch_claims = ", ".join(row["claim_id"] for row in parity_mismatches)
+        lines.append(
+            "- Parity alignment mismatch vs ree-v2 for "
+            f"{mismatch_claims}; ree-v1-minimal matched comparator design currently yields mixed claim-level direction."
+        )
     for blocker in args.blocker:
         lines.append(f"- {blocker}")
-    if not args.blocker:
+    if not args.blocker and not parity_mismatches:
         lines.append("None.")
     lines.append("")
     lines.append("## Local Compute Options Watch")
