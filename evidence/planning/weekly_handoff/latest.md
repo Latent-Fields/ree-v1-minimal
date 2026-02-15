@@ -3,7 +3,7 @@
 ## Metadata
 - week_of_utc: `2026-02-09`
 - producer_repo: `ree-v1-minimal`
-- producer_commit: `6bcb466b273ca646a744d66f05e199d1c394c0dd`
+- producer_commit: `d4cca08f74d5c5ee7aa1a8bb3f0be167e2a7a788`
 - generated_utc: `2026-02-14T20:00:00Z`
 
 ## Contract Sync
