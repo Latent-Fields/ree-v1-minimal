@@ -258,7 +258,7 @@ See the [tests/](../tests/) directory for comprehensive tests:
 ### External Links
 
 - [Project Repository](https://github.com/Latent-Fields/ree-v1-minimal)
-- [License (CC BY 4.0)](../LICENSE)
+- [License (Apache-2.0)](../LICENSE)
 
 ### Internal Files
 

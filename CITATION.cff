@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it using the metadata below."
+title: "REE v1 Minimal Implementation"
+abstract: >
+  Minimal implementation lane for REE concepts with contract-compatible
+  run artifacts and migration-support experiments.
+type: software
+authors:
+  - family-names: Golden
+    given-names: Daniel
+    affiliation: Independent Researcher
+year: 2026
+license: Apache-2.0
+repository-code: https://github.com/Latent-Fields/ree-v1-minimal
+keywords:
+  - reflective ethical engine
+  - minimal implementation
+  - migration lane
+preferred-citation:
+  type: software
+  title: "Reflective-Ethical Engine (REE)"
+  authors:
+    - family-names: Golden
+      given-names: Daniel
+      affiliation: Independent Researcher
+  year: 2026
+  repository-code: https://github.com/Latent-Fields/REE_assembly/
+  license: Apache-2.0

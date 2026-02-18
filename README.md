@@ -294,10 +294,12 @@ J(ζ) = F(ζ) + λ·M(ζ) + ρ·Φ_R(ζ)
 ✅ **Predictive Processing**: Unified framework based on precision-weighted prediction errors  
 ✅ **Extensible Design**: Easy to integrate with custom environments and components  
 
+
 ## License
 
-CC BY 4.0 (Creative Commons Attribution 4.0 International)
+Apache License 2.0 (see `LICENSE`).
 
 ## Citation
 
-If you use this implementation, please cite the original REE specification.
+- Cite this repository using `CITATION.cff`.
+- For canonical architectural attribution, cite Daniel Golden's REE specification in `https://github.com/Latent-Fields/REE_assembly/` (also captured as the preferred citation in `CITATION.cff`).
