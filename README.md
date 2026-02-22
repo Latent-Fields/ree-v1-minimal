@@ -2,6 +2,10 @@
 
 A minimal reference implementation of the **Reflective-Ethical Engine (REE)** architecture.
 
+Status:
+- `ree-v1-minimal` is deprecated as an authoritative qualification/parity lane.
+- It remains supported as a contract-compliance/backstop emitter for Experiment Pack v1 artifacts.
+
 ## Overview
 
 REE is a reference architecture for ethical agency under uncertainty. This implementation demonstrates the core concepts:
@@ -204,6 +208,7 @@ python3 scripts/validate_weekly_handoff.py --input evidence/planning/weekly_hand
   - rows are sorted by `experiment_type` then `run_id`.
   - `generated_utc` defaults to max observed run timestamp unless overridden.
   - parity note compares claim-summary directionality against latest `ree-v2` handoff when available; otherwise emits `N/A`.
+  - default `--parity-authority=deprecated` marks this lane as non-authoritative for parity decisions.
   - Local Compute Options Watch defaults to `N/A` for parity/backstop unless explicitly overridden.
 
 Ingestion compatibility check (from `REE_assembly` checkout):

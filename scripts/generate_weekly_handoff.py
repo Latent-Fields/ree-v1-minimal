@@ -143,7 +143,7 @@ def dominant_direction(counts: dict[str, int]) -> str:
 
 
 def build_parity_delta(
-    local_claims: dict[str, dict[str, Any]], ree_v2_handoff: Path
+    local_claims: dict[str, dict[str, Any]], ree_v2_handoff: Path, parity_authority: str
 ) -> tuple[list[dict[str, str]], str]:
     remote_claims: dict[str, dict[str, int]] | None = None
     if ree_v2_handoff.exists():
@@ -170,10 +170,16 @@ def build_parity_delta(
             if local_direction == remote_direction:
                 reason = "Aligned dominant direction."
             else:
-                reason = (
-                    "Direction mismatch: ree-v1-minimal includes matched positive/ablated "
-                    "condition pairs, producing split outcomes."
-                )
+                if parity_authority == "deprecated":
+                    reason = (
+                        "Expected mismatch: ree-v1-minimal is deprecated as parity authority "
+                        "and retained as contract/backstop emitter."
+                    )
+                else:
+                    reason = (
+                        "Direction mismatch: ree-v1-minimal includes matched positive/ablated "
+                        "condition pairs, producing split outcomes."
+                    )
 
         rows.append(
             {
@@ -193,7 +199,14 @@ def build_parity_delta(
         desc = ", ".join(
             f"{r['claim_id']}({r['ree_v1_direction']} vs {r['ree_v2_direction']})" for r in mismatches
         )
-        note = f"Parity note vs latest ree-v2: mismatch on {desc}; source={ree_v2_handoff}."
+        if parity_authority == "deprecated":
+            note = (
+                "Parity note vs latest ree-v2: mismatch on "
+                f"{desc}; expected because ree-v1-minimal parity authority is deprecated; "
+                f"source={ree_v2_handoff}."
+            )
+        else:
+            note = f"Parity note vs latest ree-v2: mismatch on {desc}; source={ree_v2_handoff}."
     else:
         covered = [r for r in rows if r["ree_v2_direction"] != "unknown"]
         if covered:
@@ -285,6 +298,12 @@ def parse_args() -> argparse.Namespace:
         "--parity-note",
         default="",
         help="Optional explicit parity note override.",
+    )
+    parser.add_argument(
+        "--parity-authority",
+        default="deprecated",
+        choices=["authoritative", "deprecated"],
+        help="Whether ree-v1-minimal is authoritative for parity decisions.",
     )
     parser.add_argument(
         "--local-compute-options-watch",
@@ -441,7 +460,11 @@ def main() -> int:
     producer_commit = git_value(repo_root, "rev-parse", "HEAD")
     schema_version_set = ", ".join(sorted(schema_versions))
 
-    parity_rows, computed_parity_note = build_parity_delta(claim_summary, Path(args.ree_v2_handoff))
+    parity_rows, computed_parity_note = build_parity_delta(
+        claim_summary,
+        Path(args.ree_v2_handoff),
+        args.parity_authority,
+    )
     parity_note = args.parity_note if args.parity_note else computed_parity_note
 
     lines: list[str] = []
@@ -452,6 +475,9 @@ def main() -> int:
     lines.append(f"- producer_repo: `{producer_repo}`")
     lines.append(f"- producer_commit: `{producer_commit}`")
     lines.append(f"- generated_utc: `{generated_utc}`")
+    lines.append(
+        f"- lane_role: `backstop_contract_emitter` (parity_authority=`{args.parity_authority}`)"
+    )
     lines.append("")
     lines.append("## Contract Sync")
     lines.append(f"- ree_assembly_repo: `{lock_doc.get('ree_assembly_repo', 'N/A')}`")
@@ -523,7 +549,7 @@ def main() -> int:
     parity_mismatches = [
         row for row in parity_rows if row["ree_v2_direction"] != "unknown" and row["ree_v1_direction"] != row["ree_v2_direction"]
     ]
-    if parity_mismatches:
+    if parity_mismatches and args.parity_authority != "deprecated":
         mismatch_claims = ", ".join(row["claim_id"] for row in parity_mismatches)
         lines.append(
             "- Parity alignment mismatch vs ree-v2 for "
@@ -531,7 +557,7 @@ def main() -> int:
         )
     for blocker in args.blocker:
         lines.append(f"- {blocker}")
-    if not args.blocker and not parity_mismatches:
+    if not args.blocker and (not parity_mismatches or args.parity_authority == "deprecated"):
         lines.append("None.")
     lines.append("")
     lines.append("## Local Compute Options Watch")

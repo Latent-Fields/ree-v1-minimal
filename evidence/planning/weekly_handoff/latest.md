@@ -3,8 +3,9 @@
 ## Metadata
 - week_of_utc: `2026-02-16`
 - producer_repo: `ree-v1-minimal`
-- producer_commit: `8654ce36691d62bf774cf67617811d5a3cc245ca`
+- producer_commit: `9a7fac5385c6fcc75cbf5f02da233447f66a1e24`
 - generated_utc: `2026-02-21T15:12:23Z`
+- lane_role: `backstop_contract_emitter` (parity_authority=`deprecated`)
 
 ## Contract Sync
 - ree_assembly_repo: `https://github.com/Latent-Fields/REE_assembly`
@@ -48,18 +49,18 @@
 | MECH-058 | 4 | 2 | 2 | 0 | 0 | threshold:e1_e2_timescale_separation_ratio, threshold:latent_prediction_error_mean, threshold:latent_prediction_error_p95, threshold:latent_rollout_consistency_rate, threshold:representation_drift_rate |
 | MECH-059 | 4 | 2 | 2 | 0 | 0 | threshold:latent_prediction_error_mean, threshold:latent_uncertainty_calibration_error, threshold:precision_input_completeness_rate, threshold:uncertainty_coverage_rate |
 | MECH-060 | 4 | 2 | 2 | 0 | 0 | threshold:commitment_reversal_rate, threshold:cross_channel_leakage_rate, threshold:post_commit_error_attribution_gain, threshold:pre_commit_error_signal_to_noise |
-Parity note: Parity note vs latest ree-v2: mismatch on MECH-056(mixed vs weakens), MECH-058(mixed vs supports), MECH-060(mixed vs supports); source=/Users/dgolden/Documents/GitHub/ree-v2/evidence/planning/weekly_handoff/latest.md.
+Parity note: Parity note vs latest ree-v2: mismatch on MECH-056(mixed vs weakens), MECH-058(mixed vs supports), MECH-060(mixed vs supports); expected because ree-v1-minimal parity authority is deprecated; source=/Users/dgolden/Documents/GitHub/ree-v2/evidence/planning/weekly_handoff/latest.md.
 
 ## Parity Delta Summary vs ree-v2
 | claim_id | ree_v1_minimal_direction | ree_v2_direction | reason |
 | --- | --- | --- | --- |
-| MECH-056 | mixed | weakens | Direction mismatch: ree-v1-minimal includes matched positive/ablated condition pairs, producing split outcomes. |
-| MECH-058 | mixed | supports | Direction mismatch: ree-v1-minimal includes matched positive/ablated condition pairs, producing split outcomes. |
+| MECH-056 | mixed | weakens | Expected mismatch: ree-v1-minimal is deprecated as parity authority and retained as contract/backstop emitter. |
+| MECH-058 | mixed | supports | Expected mismatch: ree-v1-minimal is deprecated as parity authority and retained as contract/backstop emitter. |
 | MECH-059 | mixed | mixed | Aligned dominant direction. |
-| MECH-060 | mixed | supports | Direction mismatch: ree-v1-minimal includes matched positive/ablated condition pairs, producing split outcomes. |
+| MECH-060 | mixed | supports | Expected mismatch: ree-v1-minimal is deprecated as parity authority and retained as contract/backstop emitter. |
 
 ## Open Blockers
-- Parity alignment mismatch vs ree-v2 for MECH-056, MECH-058, MECH-060; ree-v1-minimal matched comparator design currently yields mixed claim-level direction.
+None.
 
 ## Local Compute Options Watch
 - local_options_last_updated_utc: `N/A`

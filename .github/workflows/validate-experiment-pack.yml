@@ -17,5 +17,5 @@ jobs:
         env:
           EXPERIMENT_PACK_ROOT: tests/fixtures/experiment_pack_v1
         run: python scripts/validate_experiment_packs.py
-      - name: Validate weekly handoff report
-        run: python scripts/validate_weekly_handoff_report.py --report evidence/planning/weekly_handoff_current.md
+      - name: Validate weekly backstop handoff report
+        run: python3 scripts/validate_weekly_handoff.py --input evidence/planning/weekly_handoff/latest.md
