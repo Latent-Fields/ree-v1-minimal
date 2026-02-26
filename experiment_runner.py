@@ -303,6 +303,10 @@ def main():
                 status["idle"] = True
                 status["current"] = None
                 status["runner_pid"] = None
+                # Reset any queue item stuck in "running" back to "pending"
+                for qi in status.get("queue", []):
+                    if qi.get("status") == "running":
+                        qi["status"] = "pending"
                 write_status(status, status_path)
             except Exception:
                 pass
