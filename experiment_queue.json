@@ -1,0 +1,68 @@
+{
+  "schema_version": "v1",
+  "calibration": {
+    "ms_per_episode_condition": 750,
+    "hardware": "Apple M2 Air 8 GB",
+    "calibrated_at": "2026-02-26",
+    "calibration_experiment": "control_plane_precision_separation",
+    "calibration_note": "200 eps x 3 seeds x 2 conditions ~ 15 min on M2 Air 8GB => 750 ms per episode-condition"
+  },
+  "items": [
+    {
+      "queue_id": "EXQ-001",
+      "backlog_id": "EVB-0039",
+      "claim_id": "MECH-056",
+      "title": "Residue Trajectory Placement",
+      "description": "Tests whether residue accumulates at trajectory positions during rollout, not only at the final executed step. Validates REE invariant that harm sites are precisely localised along the planned path rather than post-hoc.",
+      "script": "experiments/residue_trajectory_placement.py",
+      "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
+      "seeds": 3,
+      "conditions": 2,
+      "episodes_per_run": 200,
+      "status": "needs_script",
+      "status_reason": "Experiment script not yet written (P2 backlog)"
+    },
+    {
+      "queue_id": "EXQ-002",
+      "backlog_id": "EVB-0040",
+      "claim_id": "MECH-058",
+      "title": "E1/E2 Timescale Ablation",
+      "description": "Ablates the E1 (LSTM slow predictor) versus E2 (fast rollout generator) timescale separation. Tests whether the two-speed architecture improves latent stability compared to a single-speed baseline on ree-v1-minimal.",
+      "script": "experiments/e1_e2_timescale_ablation.py",
+      "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
+      "seeds": 3,
+      "conditions": 2,
+      "episodes_per_run": 200,
+      "status": "needs_script",
+      "status_reason": "Experiment script not yet written (P2 backlog)"
+    },
+    {
+      "queue_id": "EXQ-003",
+      "backlog_id": "EVB-0041",
+      "claim_id": "MECH-061",
+      "title": "Commitment Boundary Token Reclassification",
+      "description": "Validates that REE's commitment boundary correctly reclassifies pre-commit simulation errors as post-commit realised errors. Tests the boundary token approach retained under the retain_ree adjudication.",
+      "script": "experiments/commitment_boundary_validation.py",
+      "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
+      "seeds": 3,
+      "conditions": 2,
+      "episodes_per_run": 200,
+      "status": "needs_script",
+      "status_reason": "Experiment script not yet written (P2 backlog)"
+    },
+    {
+      "queue_id": "EXQ-004",
+      "backlog_id": "EVB-0042",
+      "claim_id": "MECH-057",
+      "title": "Control Completion Requirement",
+      "description": "Tests MECH-057 (control_completion_requirement): whether REE's control plane requires action completion before new precision updates are admitted. Needs design review following JEPA decoupling.",
+      "script": "experiments/control_completion_requirement.py",
+      "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
+      "seeds": 3,
+      "conditions": 2,
+      "episodes_per_run": 200,
+      "status": "needs_script",
+      "status_reason": "Needs redesign after JEPA decoupling (P3 backlog)"
+    }
+  ]
+}
