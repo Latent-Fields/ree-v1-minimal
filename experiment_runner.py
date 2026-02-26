@@ -34,6 +34,7 @@ import re
 import signal
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -205,6 +206,15 @@ def run_experiment(item: dict, status: dict, status_path: Path, calibration: dic
             bufsize=1,
         )
 
+        # Heartbeat thread: write elapsed time every 5 s even when the
+        # experiment script has no new output (e.g. between ep-50 prints).
+        _hb_stop = threading.Event()
+        def _heartbeat():
+            while not _hb_stop.wait(timeout=STATUS_WRITE_INTERVAL):
+                update_status_current()
+        _hb_thread = threading.Thread(target=_heartbeat, daemon=True)
+        _hb_thread.start()
+
         for line in proc.stdout:
             line = line.rstrip()
             print(line, flush=True)
@@ -247,6 +257,7 @@ def run_experiment(item: dict, status: dict, status_path: Path, calibration: dic
                 update_status_current()
                 last_write = time.monotonic()
 
+        _hb_stop.set()
         proc.wait()
         exit_code = proc.returncode
 
