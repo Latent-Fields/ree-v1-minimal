@@ -1,0 +1,195 @@
+{
+  "experiment": "consolidation_ablation",
+  "claim_ids_tested": [
+    "MECH-068"
+  ],
+  "csh_sub_claim": "CSH-1",
+  "run_timestamp_utc": "2026-02-26T10:45:22.684151+00:00",
+  "config": {
+    "seed": 7,
+    "num_episodes_per_config": 5,
+    "max_steps_per_episode": 50,
+    "grid_size": 10,
+    "num_hazards": 4,
+    "warmup_episodes": 3,
+    "lambda_values": [
+      0.0,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "rho_values": [
+      0.0,
+      0.5,
+      1.0
+    ]
+  },
+  "baseline_config_key": "lambda_1.0_rho_0.5",
+  "config_results": {
+    "lambda_1.0_rho_0.5": {
+      "lambda_ethical": 1.0,
+      "rho_residue": 0.5,
+      "is_baseline": true,
+      "e1_frozen": false,
+      "mean_harm_per_episode": 0.44000000000000006,
+      "mean_hazard_visits_per_episode": 1.0,
+      "mean_episode_length": 44.4,
+      "e1_stability": {
+        "z_theta_cosine_sim": 1.0,
+        "z_delta_cosine_sim": 1.0
+      }
+    },
+    "lambda_0.0_rho_0.0": {
+      "lambda_ethical": 0.0,
+      "rho_residue": 0.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.4,
+      "mean_hazard_visits_per_episode": 1.4,
+      "mean_episode_length": 50.0,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998652416727,
+        "z_delta_cosine_sim": 0.9999999844509623
+      }
+    },
+    "lambda_0.0_rho_0.5": {
+      "lambda_ethical": 0.0,
+      "rho_residue": 0.5,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.78,
+      "mean_hazard_visits_per_episode": 1.8,
+      "mean_episode_length": 39.4,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999997615814209,
+        "z_delta_cosine_sim": 0.9999999761581421
+      }
+    },
+    "lambda_0.0_rho_1.0": {
+      "lambda_ethical": 0.0,
+      "rho_residue": 1.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.54,
+      "mean_hazard_visits_per_episode": 1.2,
+      "mean_episode_length": 42.8,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998645348982,
+        "z_delta_cosine_sim": 0.9999999837441877
+      }
+    },
+    "lambda_0.5_rho_0.0": {
+      "lambda_ethical": 0.5,
+      "rho_residue": 0.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.7,
+      "mean_hazard_visits_per_episode": 1.4,
+      "mean_episode_length": 50.0,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998496926349,
+        "z_delta_cosine_sim": 0.9999999792679496
+      }
+    },
+    "lambda_0.5_rho_0.5": {
+      "lambda_ethical": 0.5,
+      "rho_residue": 0.5,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.7,
+      "mean_hazard_visits_per_episode": 1.4,
+      "mean_episode_length": 46.8,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998185945593,
+        "z_delta_cosine_sim": 0.9999999870424685
+      }
+    },
+    "lambda_0.5_rho_1.0": {
+      "lambda_ethical": 0.5,
+      "rho_residue": 1.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.08,
+      "mean_hazard_visits_per_episode": 0.4,
+      "mean_episode_length": 50.0,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998471011287,
+        "z_delta_cosine_sim": 0.9999999689019244
+      }
+    },
+    "lambda_1.0_rho_0.0": {
+      "lambda_ethical": 1.0,
+      "rho_residue": 0.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.64,
+      "mean_hazard_visits_per_episode": 1.4,
+      "mean_episode_length": 36.8,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999996925655165,
+        "z_delta_cosine_sim": 0.9999999811774806
+      }
+    },
+    "lambda_1.0_rho_1.0": {
+      "lambda_ethical": 1.0,
+      "rho_residue": 1.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.32,
+      "mean_hazard_visits_per_episode": 1.0,
+      "mean_episode_length": 50.0,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998574671538,
+        "z_delta_cosine_sim": 0.9999999766764434
+      }
+    },
+    "lambda_2.0_rho_0.0": {
+      "lambda_ethical": 2.0,
+      "rho_residue": 0.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.4,
+      "mean_hazard_visits_per_episode": 0.8,
+      "mean_episode_length": 45.4,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.999999805637028,
+        "z_delta_cosine_sim": 0.9999999844509623
+      }
+    },
+    "lambda_2.0_rho_0.5": {
+      "lambda_ethical": 2.0,
+      "rho_residue": 0.5,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.5599999999999999,
+      "mean_hazard_visits_per_episode": 1.6,
+      "mean_episode_length": 50.0,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998289605846,
+        "z_delta_cosine_sim": 0.9999999818594559
+      }
+    },
+    "lambda_2.0_rho_1.0": {
+      "lambda_ethical": 2.0,
+      "rho_residue": 1.0,
+      "is_baseline": false,
+      "e1_frozen": true,
+      "mean_harm_per_episode": 0.6,
+      "mean_hazard_visits_per_episode": 1.2,
+      "mean_episode_length": 41.6,
+      "e1_stability": {
+        "z_theta_cosine_sim": 0.9999998467309135,
+        "z_delta_cosine_sim": 0.9999999716168358
+      }
+    }
+  },
+  "verdict": {
+    "verdict": "PASS",
+    "harm_range_across_configs": 0.7,
+    "mean_e1_latent_stability": 1.0,
+    "selectivity_criterion_met": true,
+    "stability_criterion_met": true,
+    "failure_signatures": [],
+    "interpretation": "CSH-1 supported: E3 consolidation weights changed trajectory preference while E1 latent structure remained stable."
+  }
+}

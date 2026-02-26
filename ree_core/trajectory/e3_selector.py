@@ -41,6 +41,9 @@ class SelectionResult:
         scores: All trajectory scores
         precision: Commitment precision level
         committed: Whether commitment threshold was met
+        log_prob: Log-probability of the selected trajectory (for policy gradient).
+            Remains connected to the computation graph so that policy_loss.backward()
+            can update reality_scorer and ethical_scorer weights.
     """
     selected_trajectory: Trajectory
     selected_index: int
@@ -48,6 +51,7 @@ class SelectionResult:
     scores: torch.Tensor
     precision: float
     committed: bool
+    log_prob: Optional[torch.Tensor] = None
 
 
 class E3TrajectorySelector(nn.Module):
@@ -254,6 +258,11 @@ class E3TrajectorySelector(nn.Module):
         # Extract first action from selected trajectory
         selected_action = selected_trajectory.actions[:, 0, :]
 
+        # Compute log-probability of selection for policy gradient (REINFORCE).
+        # log_softmax preserves the computation graph through scores → scorers.
+        log_probs = F.log_softmax(-scores / temperature, dim=0)
+        log_prob = log_probs[selected_idx]
+
         # Update commitment state
         if committed:
             self._committed_trajectory = selected_trajectory
@@ -264,7 +273,8 @@ class E3TrajectorySelector(nn.Module):
             selected_action=selected_action,
             scores=scores,
             precision=self.current_precision,
-            committed=committed
+            committed=committed,
+            log_prob=log_prob,
         )
 
     def update_precision(

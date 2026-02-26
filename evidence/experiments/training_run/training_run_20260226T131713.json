@@ -1,0 +1,379 @@
+{
+  "experiment": "training_run",
+  "claim_ids_relevant": [
+    "ARC-015",
+    "MECH-062"
+  ],
+  "run_timestamp_utc": "2026-02-26T13:17:13.143687+00:00",
+  "config": {
+    "num_episodes": 50,
+    "max_steps": 60,
+    "seed": 7,
+    "grid_size": 10,
+    "num_hazards": 4,
+    "e1_lr": 0.0001,
+    "policy_lr": 0.001
+  },
+  "assessment": {
+    "verdict": "IMPROVED",
+    "mean_harm_first_quarter": 1.0,
+    "mean_harm_last_quarter": 0.675,
+    "harm_reduction": 0.325,
+    "harm_improved": true,
+    "e1_loss_trend": "decreasing",
+    "e1_improved": true,
+    "interpretation": "Agent reduced harm accumulation over training."
+  },
+  "history": [
+    {
+      "episode": 0,
+      "total_harm": 1.5,
+      "steps": 13,
+      "policy_loss": -5.167953014373779,
+      "e1_loss": 0.00861416943371296
+    },
+    {
+      "episode": 1,
+      "total_harm": 0.7,
+      "steps": 60,
+      "policy_loss": -2.430816888809204,
+      "e1_loss": 0.008925363421440125
+    },
+    {
+      "episode": 2,
+      "total_harm": 1.0,
+      "steps": 60,
+      "policy_loss": -3.4613091945648193,
+      "e1_loss": 0.0076500424183905125
+    },
+    {
+      "episode": 3,
+      "total_harm": 1.1,
+      "steps": 59,
+      "policy_loss": -3.805022954940796,
+      "e1_loss": 0.008686096407473087
+    },
+    {
+      "episode": 4,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.008453389629721642
+    },
+    {
+      "episode": 5,
+      "total_harm": 1.0,
+      "steps": 19,
+      "policy_loss": -3.454724073410034,
+      "e1_loss": 0.007355540059506893
+    },
+    {
+      "episode": 6,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.008462685160338879
+    },
+    {
+      "episode": 7,
+      "total_harm": 1.4,
+      "steps": 11,
+      "policy_loss": -4.815541744232178,
+      "e1_loss": 0.007888305000960827
+    },
+    {
+      "episode": 8,
+      "total_harm": 1.2,
+      "steps": 19,
+      "policy_loss": -4.144959926605225,
+      "e1_loss": 0.006814063526690006
+    },
+    {
+      "episode": 9,
+      "total_harm": 1.2999999999999998,
+      "steps": 44,
+      "policy_loss": -4.503071308135986,
+      "e1_loss": 0.007047815714031458
+    },
+    {
+      "episode": 10,
+      "total_harm": 1.4,
+      "steps": 24,
+      "policy_loss": -4.861919403076172,
+      "e1_loss": 0.007919328287243843
+    },
+    {
+      "episode": 11,
+      "total_harm": 1.4,
+      "steps": 32,
+      "policy_loss": -4.850305080413818,
+      "e1_loss": 0.006918029394000769
+    },
+    {
+      "episode": 12,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.733546495437622,
+      "e1_loss": 0.007814457640051842
+    },
+    {
+      "episode": 13,
+      "total_harm": 1.0,
+      "steps": 33,
+      "policy_loss": -3.45029878616333,
+      "e1_loss": 0.006901328451931477
+    },
+    {
+      "episode": 14,
+      "total_harm": 1.4,
+      "steps": 52,
+      "policy_loss": -4.844817638397217,
+      "e1_loss": 0.006948890630155802
+    },
+    {
+      "episode": 15,
+      "total_harm": 0.7,
+      "steps": 60,
+      "policy_loss": -2.431645631790161,
+      "e1_loss": 0.007507828529924154
+    },
+    {
+      "episode": 16,
+      "total_harm": 0.9,
+      "steps": 60,
+      "policy_loss": -3.122972011566162,
+      "e1_loss": 0.007426085881888866
+    },
+    {
+      "episode": 17,
+      "total_harm": 1.0,
+      "steps": 60,
+      "policy_loss": -3.4707326889038086,
+      "e1_loss": 0.007061302661895752
+    },
+    {
+      "episode": 18,
+      "total_harm": 1.0,
+      "steps": 60,
+      "policy_loss": -3.4592320919036865,
+      "e1_loss": 0.007347738835960627
+    },
+    {
+      "episode": 19,
+      "total_harm": 1.0,
+      "steps": 28,
+      "policy_loss": -3.4631495475769043,
+      "e1_loss": 0.005978931672871113
+    },
+    {
+      "episode": 20,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.7359870672225952,
+      "e1_loss": 0.007113507948815823
+    },
+    {
+      "episode": 21,
+      "total_harm": 1.0,
+      "steps": 14,
+      "policy_loss": -3.4703285694122314,
+      "e1_loss": 0.006789690349251032
+    },
+    {
+      "episode": 22,
+      "total_harm": 1.0,
+      "steps": 34,
+      "policy_loss": -3.4651193618774414,
+      "e1_loss": 0.007000769022852182
+    },
+    {
+      "episode": 23,
+      "total_harm": 1.2999999999999998,
+      "steps": 33,
+      "policy_loss": -4.492595195770264,
+      "e1_loss": 0.006253973580896854
+    },
+    {
+      "episode": 24,
+      "total_harm": 1.4,
+      "steps": 30,
+      "policy_loss": -4.8440680503845215,
+      "e1_loss": 0.005905512720346451
+    },
+    {
+      "episode": 25,
+      "total_harm": 1.0,
+      "steps": 49,
+      "policy_loss": -3.4620723724365234,
+      "e1_loss": 0.005830360110849142
+    },
+    {
+      "episode": 26,
+      "total_harm": 1.0,
+      "steps": 45,
+      "policy_loss": -3.4789373874664307,
+      "e1_loss": 0.006670432630926371
+    },
+    {
+      "episode": 27,
+      "total_harm": 1.0,
+      "steps": 45,
+      "policy_loss": -3.453692674636841,
+      "e1_loss": 0.006499997340142727
+    },
+    {
+      "episode": 28,
+      "total_harm": 0.7,
+      "steps": 60,
+      "policy_loss": -2.429144859313965,
+      "e1_loss": 0.006254913751035929
+    },
+    {
+      "episode": 29,
+      "total_harm": 1.0999999999999999,
+      "steps": 31,
+      "policy_loss": -3.7983362674713135,
+      "e1_loss": 0.005758882500231266
+    },
+    {
+      "episode": 30,
+      "total_harm": 0.2,
+      "steps": 60,
+      "policy_loss": -0.6918809413909912,
+      "e1_loss": 0.005494188517332077
+    },
+    {
+      "episode": 31,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.005369585007429123
+    },
+    {
+      "episode": 32,
+      "total_harm": 1.0,
+      "steps": 4,
+      "policy_loss": -3.476912498474121,
+      "e1_loss": 0.005973705556243658
+    },
+    {
+      "episode": 33,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.005890721920877695
+    },
+    {
+      "episode": 34,
+      "total_harm": 0.6000000000000001,
+      "steps": 60,
+      "policy_loss": -2.075892210006714,
+      "e1_loss": 0.005399511195719242
+    },
+    {
+      "episode": 35,
+      "total_harm": 0.2,
+      "steps": 60,
+      "policy_loss": -0.6950810551643372,
+      "e1_loss": 0.0057836570776999
+    },
+    {
+      "episode": 36,
+      "total_harm": 0.2,
+      "steps": 60,
+      "policy_loss": -0.6929828524589539,
+      "e1_loss": 0.005314692389219999
+    },
+    {
+      "episode": 37,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.723320722579956,
+      "e1_loss": 0.005580937955528498
+    },
+    {
+      "episode": 38,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.0054549952037632465
+    },
+    {
+      "episode": 39,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.719133973121643,
+      "e1_loss": 0.0050559877417981625
+    },
+    {
+      "episode": 40,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.005265319719910622
+    },
+    {
+      "episode": 41,
+      "total_harm": 0.8,
+      "steps": 60,
+      "policy_loss": -2.7794790267944336,
+      "e1_loss": 0.0044259303249418736
+    },
+    {
+      "episode": 42,
+      "total_harm": 1.4,
+      "steps": 36,
+      "policy_loss": -4.834192752838135,
+      "e1_loss": 0.004924110136926174
+    },
+    {
+      "episode": 43,
+      "total_harm": 0.0,
+      "steps": 60,
+      "policy_loss": -0.0,
+      "e1_loss": 0.004849754273891449
+    },
+    {
+      "episode": 44,
+      "total_harm": 1.0,
+      "steps": 57,
+      "policy_loss": -3.4639415740966797,
+      "e1_loss": 0.004897255916148424
+    },
+    {
+      "episode": 45,
+      "total_harm": 1.2,
+      "steps": 40,
+      "policy_loss": -4.153955459594727,
+      "e1_loss": 0.005414403975009918
+    },
+    {
+      "episode": 46,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.7428256273269653,
+      "e1_loss": 0.004608725663274527
+    },
+    {
+      "episode": 47,
+      "total_harm": 1.0,
+      "steps": 17,
+      "policy_loss": -3.479344606399536,
+      "e1_loss": 0.004393664188683033
+    },
+    {
+      "episode": 48,
+      "total_harm": 1.2,
+      "steps": 8,
+      "policy_loss": -4.08657693862915,
+      "e1_loss": 0.004355491604655981
+    },
+    {
+      "episode": 49,
+      "total_harm": 0.5,
+      "steps": 60,
+      "policy_loss": -1.7408106327056885,
+      "e1_loss": 0.00429669301956892
+    }
+  ]
+}
