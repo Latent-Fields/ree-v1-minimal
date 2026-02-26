@@ -129,7 +129,10 @@ def run_experiment(item: dict, status: dict, status_path: Path, calibration: dic
     output_file (if found in stdout), error (if failed).
     """
     script = REPO_ROOT / item["script"]
-    args = [sys.executable, str(script)] + item.get("args", [])
+    # -u: force unbuffered stdout so progress lines reach the runner in real time
+    # (without -u Python block-buffers when writing to a pipe, so no lines arrive
+    # until the experiment finishes and the buffer flushes on process exit)
+    args = [sys.executable, "-u", str(script)] + item.get("args", [])
 
     seeds = item.get("seeds", 3)
     conditions = item.get("conditions", 2)
