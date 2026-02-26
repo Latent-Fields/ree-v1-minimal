@@ -101,6 +101,9 @@ class E3TrajectorySelector(nn.Module):
         # Track commitment state
         self._committed_trajectory: Optional[Trajectory] = None
 
+        # Last selection scores (stored for confidence diagnostics)
+        self.last_scores: Optional[torch.Tensor] = None
+
     def compute_reality_cost(self, trajectory: Trajectory) -> torch.Tensor:
         """
         Compute reality constraint cost F(ζ).
@@ -239,6 +242,7 @@ class E3TrajectorySelector(nn.Module):
         # Score all candidates
         scores = torch.stack([self.score_trajectory(traj) for traj in candidates])
         scores = scores.mean(dim=-1)  # Aggregate over batch
+        self.last_scores = scores.detach()  # Store for confidence diagnostics
 
         # Apply softmax selection (lower score = higher probability)
         probs = F.softmax(-scores / temperature, dim=0)
