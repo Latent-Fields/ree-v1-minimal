@@ -24,6 +24,7 @@ from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from ree_core.utils.config import REEConfig
 from ree_core.latent.stack import LatentStack, LatentState
@@ -319,6 +320,87 @@ class REEAgent(nn.Module):
         metrics["harm_this_episode"] = self._harm_this_episode
 
         return metrics
+
+    def compute_prediction_loss(self) -> torch.Tensor:
+        """
+        Return a differentiable E1 world-model prediction loss for training.
+
+        Samples a random contiguous sequence from the experience buffer,
+        runs E1's LSTM predictor, and returns the MSE loss between predictions
+        and actual observed states.  Gradients flow through E1's transition_rnn,
+        output_proj, and prior_generator weights.
+
+        The inference hidden state is saved and restored so that online acting
+        is not disturbed by the training replay.
+
+        Returns:
+            Scalar loss tensor with grad_fn attached.  Returns a zero-loss
+            tensor (still differentiable via E1 params) if the buffer is too
+            short to form a sequence.
+        """
+        # Differentiable zero anchored to E1 params (safe fallback)
+        zero_loss = next(self.e1.parameters()).sum() * 0.0
+
+        if len(self._experience_buffer) < 2:
+            return zero_loss
+
+        buf_len = len(self._experience_buffer)
+        horizon = self.e1.config.prediction_horizon
+        # Need at least 2 entries: initial state + 1 target
+        max_start = max(1, buf_len - 1)
+        start_idx = int(torch.randint(0, max_start, (1,)).item())
+        end_idx = min(start_idx + horizon + 1, buf_len)
+
+        if end_idx - start_idx < 2:
+            return zero_loss
+
+        # Buffer items have shape [1, dim] (batch dim = 1).  Squeeze to [dim],
+        # stack into [seq_len, dim], then add batch dim → [1, seq_len, dim].
+        sequence = torch.stack(
+            [x.squeeze(0) for x in self._experience_buffer[start_idx:end_idx]]
+        ).unsqueeze(0)  # [1, seq_len, dim]
+
+        # Temporarily reset hidden state for a clean replay pass
+        saved_hidden = self.e1._hidden_state
+        self.e1.reset_hidden_state()
+
+        initial_state = sequence[:, 0, :]          # [1, dim] detached — fine as input
+        horizon_len = sequence.shape[1] - 1
+        predictions = self.e1.predict_long_horizon(initial_state, horizon=horizon_len)
+        targets = sequence[:, 1:, :]               # [1, horizon_len, dim] detached
+
+        loss = F.mse_loss(predictions[:, :targets.shape[1], :], targets)
+
+        # Restore inference hidden state (predict_long_horizon stored detached end-state)
+        self.e1._hidden_state = saved_hidden
+
+        return loss
+
+    def act_with_log_prob(
+        self,
+        observation: torch.Tensor,
+        temperature: float = 1.0
+    ):
+        """
+        Action selection with policy-gradient bookkeeping.
+
+        Identical to act() but also returns the log-probability of the
+        selected trajectory so the trainer can compute a REINFORCE loss.
+
+        Args:
+            observation: Raw observation from environment
+            temperature: Selection temperature
+
+        Returns:
+            (action, log_prob) — log_prob is a scalar tensor connected to
+            the computation graph through E3's scorer weights.
+        """
+        encoded_obs = self.sense(observation)
+        latent_state = self.update_latent(encoded_obs)
+        candidates = self.generate_trajectories(latent_state)
+        result = self.e3.select(candidates, temperature)
+        self._step_count += 1
+        return result.selected_action, result.log_prob
 
     def offline_integration(self) -> Dict[str, float]:
         """

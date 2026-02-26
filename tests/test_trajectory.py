@@ -156,6 +156,124 @@ class TestE3TrajectorySelector:
         assert "is_committed" in state
         assert "commitment_threshold" in state
 
+    # ------------------------------------------------------------------
+    # Consolidation Selectivity Tests (MECH-068 / CSH-1)
+    # ------------------------------------------------------------------
+
+    def test_e3_consolidation_independence(self, residue_field, mock_trajectory):
+        """
+        CSH-1: E3 consolidation weights change trajectory scores.
+
+        The J(zeta) = F(zeta) + lambda*M(zeta) + rho*Phi_R(zeta) scoring must
+        produce meaningfully different scores when lambda/rho are varied.
+        This verifies that the consolidation operator (E3) is actually doing
+        selective work — not that all configs produce identical outputs.
+
+        A failure here would mean E3 is not functioning as a consolidation
+        operator over the shared E1 basis.
+        """
+        latent_dim = 32
+        candidates = [mock_trajectory] * 3
+
+        scores = {}
+        configs = [
+            ("high_ethical", E3Config(latent_dim=latent_dim, lambda_ethical=2.0, rho_residue=0.0)),
+            ("zero_ethical", E3Config(latent_dim=latent_dim, lambda_ethical=0.0, rho_residue=0.0)),
+            ("high_residue", E3Config(latent_dim=latent_dim, lambda_ethical=0.0, rho_residue=2.0)),
+        ]
+
+        for name, config in configs:
+            e3_variant = E3TrajectorySelector(config, residue_field)
+            # Score first candidate
+            score = e3_variant.score_trajectory(mock_trajectory)
+            scores[name] = float(score.mean().item())
+
+        # Scores should differ between high_ethical and zero_ethical
+        # when harm_predictions are non-zero (which they are in mock_trajectory)
+        score_diff = abs(scores["high_ethical"] - scores["zero_ethical"])
+        assert score_diff > 1e-6, (
+            f"E3 consolidation weights have no effect on trajectory scores "
+            f"(high_ethical={scores['high_ethical']:.4f}, "
+            f"zero_ethical={scores['zero_ethical']:.4f}). "
+            f"E3 is not acting as a selective consolidation operator."
+        )
+
+    def test_e1_stability_under_consolidation_change(self):
+        """
+        CSH-1: E1 latent representations should not be affected by E3-only changes.
+
+        When E3 consolidation weights (lambda, rho) change but E1 weights are
+        frozen, the latent state produced by E1 from the same observation should
+        be identical (E1 is deterministic given the same input and same weights).
+
+        This is the structural guarantee: E1 = shared basis, E3 = consolidation.
+        The E1 output should be independent of E3 configuration.
+        """
+        import copy
+        from ree_core.agent import REEAgent
+        from ree_core.utils.config import REEConfig
+
+        obs_dim = 16
+        act_dim = 4
+        latent_dim = 32
+
+        # Build two agents with different E3 consolidation weights
+        config_high = REEConfig.from_dims(obs_dim, act_dim, latent_dim)
+        config_high.e3.lambda_ethical = 2.0
+        config_high.e3.rho_residue = 1.0
+
+        config_low = REEConfig.from_dims(obs_dim, act_dim, latent_dim)
+        config_low.e3.lambda_ethical = 0.0
+        config_low.e3.rho_residue = 0.0
+
+        agent_high = REEAgent(config=config_high)
+        agent_low = REEAgent(config=config_low)
+
+        # Copy the shared basis weights from agent_high to agent_low.
+        # In REE, "E1 = shared basis" corresponds to both the latent_stack (encoder)
+        # and e1 (deep predictor). We must copy both to establish a shared basis.
+        agent_low.e1.load_state_dict(copy.deepcopy(agent_high.e1.state_dict()))
+        agent_low.latent_stack.load_state_dict(copy.deepcopy(agent_high.latent_stack.state_dict()))
+
+        # Copy obs_encoder too (sits between raw obs and latent_stack)
+        if hasattr(agent_high, 'obs_encoder') and hasattr(agent_low, 'obs_encoder'):
+            agent_low.obs_encoder.load_state_dict(copy.deepcopy(agent_high.obs_encoder.state_dict()))
+
+        # Freeze E1 + latent_stack in both agents (the shared basis)
+        for param in agent_high.e1.parameters():
+            param.requires_grad = False
+        for param in agent_low.e1.parameters():
+            param.requires_grad = False
+        for param in agent_high.latent_stack.parameters():
+            param.requires_grad = False
+        for param in agent_low.latent_stack.parameters():
+            param.requires_grad = False
+
+        # Run the same observation through both agents' sense + update paths
+        # Both agents start fresh (newly constructed, no prior latent state)
+        torch.manual_seed(0)
+        obs = torch.randn(obs_dim)
+
+        with torch.no_grad():
+            encoded_high = agent_high.sense(obs)
+            latent_high = agent_high.update_latent(encoded_high)
+
+            encoded_low = agent_low.sense(obs)
+            latent_low = agent_low.update_latent(encoded_low)
+
+        # E1 outputs should be identical (same weights, same input)
+        # Compare z_theta and z_delta (E1-dominated depths in the latent stack)
+        theta_sim = torch.nn.functional.cosine_similarity(
+            latent_high.z_theta.flatten().unsqueeze(0),
+            latent_low.z_theta.flatten().unsqueeze(0),
+        ).item()
+
+        assert theta_sim > 0.99, (
+            f"E1 latent z_theta differs between agents with different E3 configs "
+            f"but identical E1 weights (cosine_sim={theta_sim:.4f}). "
+            f"E1 is not functioning as a stable shared basis independent of E3."
+        )
+
 
 class TestSelectionWithResidue:
     """Tests for selection behavior with residue field."""

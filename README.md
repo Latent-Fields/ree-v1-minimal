@@ -2,9 +2,18 @@
 
 A minimal reference implementation of the **Reflective-Ethical Engine (REE)** architecture.
 
-Status:
-- `ree-v1-minimal` is deprecated as an authoritative qualification/parity lane.
-- It remains supported as a contract-compliance/backstop emitter for Experiment Pack v1 artifacts.
+**Status: Primary experimental substrate for genuine REE claim testing (2026-02-26)**
+
+This repository is the primary testing ground for REE architectural claims. It contains a real
+PyTorch implementation of the full REE agent loop (~3000 LoC), 7 pytest test files, and a
+GridWorld environment capable of producing genuine experimental evidence.
+
+Previous status note ("deprecated as authoritative qualification/parity lane") has been rescinded.
+The ree-v2 and ree-experiments-lab repos generated synthetic parametric data, not real experimental
+results. Real evidence comes from this repo.
+
+**First genuine discriminating experiment:** Consolidation Ablation Test (MECH-068 / CSH-1).
+See `experiments/consolidation_ablation.py` and `REE_assembly/docs/architecture/compact_consolidation_principle.md`.
 
 ## Overview
 
