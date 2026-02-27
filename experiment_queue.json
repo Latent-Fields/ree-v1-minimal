@@ -59,11 +59,24 @@
       "script": "experiments/control_completion_requirement.py",
       "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
       "seeds": 3,
-      "conditions": 2,
+      "conditions": 3,
       "episodes_per_run": 200,
       "status": "pending",
-      "status_reason": "Script written and smoke-tested 2026-02-26. P3 — FAIL expected at this scale; informative baseline.",
-      "conditions": 3
+      "status_reason": "Script written and smoke-tested 2026-02-26. P3 — FAIL expected at this scale; informative baseline."
+    },
+    {
+      "queue_id": "EXQ-005",
+      "backlog_id": "EVB-0043",
+      "claim_id": "MECH-060",
+      "title": "Write-Locus Contamination (MECH-060 / MECH-067)",
+      "description": "Tests whether write-locus separation between pre-commit and post-commit channels is load-bearing for attribution reliability. Three conditions: FULL (current agent — write-locus enforced by construction: E1 trains on actual observations only, residue updates only on post-commit harm), CONTAMINATED_DURABLE (sim_error E2 harm_predictions also update E1 weights alongside compute_prediction_loss, violating pre-commit write boundary), CONTAMINATED_RESIDUE (E2 harm_predictions also accumulate residue pre-commit, before env.step). Primary metrics: Pearson correlation between E1 prediction error and realized harm per condition (attribution reliability), last-Q harm, residue calibration. Prediction: contaminated conditions degrade E1 error/realized-harm correlation and miscalibrate residue. Tests MECH-060 (dual_error_channels_pre_post_commit) and MECH-067 (write_locus_permission_matrix). pending_design cleared 2026-02-27 — channels confirmed in ree-v1-minimal via EXQ-003.",
+      "script": "experiments/write_locus_contamination.py",
+      "args": ["--episodes", "200", "--seeds", "7", "42", "99"],
+      "seeds": 3,
+      "conditions": 3,
+      "episodes_per_run": 200,
+      "status": "needs_script",
+      "status_reason": "Design complete 2026-02-27. Script not yet written. Structurally similar to commitment_boundary_validation.py — same run_condition skeleton, new contamination logic in update step."
     }
   ]
 }
