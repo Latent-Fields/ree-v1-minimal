@@ -75,8 +75,8 @@
       "seeds": 3,
       "conditions": 3,
       "episodes_per_run": 200,
-      "status": "needs_script",
-      "status_reason": "Design complete 2026-02-27. Script not yet written. Structurally similar to commitment_boundary_validation.py — same run_condition skeleton, new contamination logic in update step."
+      "status": "pending",
+      "status_reason": "Script written 2026-02-27: experiments/write_locus_contamination.py. Three conditions: FULL / CONTAMINATED_DURABLE (E1 grad scaled by E2 pred error) / CONTAMINATED_RESIDUE (pre-commit residue update). PASS criteria: residue inflation + harm ordering. ~22.5 min estimated."
     }
   ]
 }
