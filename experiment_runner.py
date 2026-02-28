@@ -296,6 +296,23 @@ def main():
         action="store_true",
         help="Show what would run without executing"
     )
+    parser.add_argument(
+        "--loop",
+        action="store_true",
+        help=(
+            "After exhausting the queue, poll experiment_queue.json every "
+            "--loop-interval seconds for new items instead of exiting. "
+            "Lets the runner stay alive so clicking Start in the explorer "
+            "keeps it running without a manual restart."
+        ),
+    )
+    parser.add_argument(
+        "--loop-interval",
+        type=int,
+        default=60,
+        metavar="SECONDS",
+        help="Seconds between queue re-checks in --loop mode (default: 60)",
+    )
     args = parser.parse_args()
 
     status_path = args.status_file or find_default_status_path()
@@ -358,54 +375,104 @@ def main():
         return
 
     print(f"[runner] PID {os.getpid()} — ready to run {len(items)} queued experiments", flush=True)
+    if args.loop:
+        print(f"[runner] Loop mode: will poll queue every {args.loop_interval}s after exhaustion", flush=True)
 
     completed_ids = {c["queue_id"] for c in existing_completed}
 
-    for item in items:
-        queue_id = item["queue_id"]
+    # Prune any already-completed items from the initial queue display
+    status["queue"] = [qi for qi in status["queue"] if qi["queue_id"] not in completed_ids]
+    write_status(status, status_path)
 
-        # Skip already completed
-        if queue_id in completed_ids:
-            print(f"[runner] Skipping {queue_id} ({item['claim_id']}) — already completed", flush=True)
-            continue
+    while True:
+        ran_any = False
 
-        # Skip items with no script
-        script = REPO_ROOT / item["script"]
-        if not script.exists():
-            print(f"[runner] Skipping {queue_id} ({item['claim_id']}) — script not found: {item['script']}", flush=True)
-            # Update queue item status in live status file
-            for qi in status["queue"]:
-                if qi["queue_id"] == queue_id:
-                    qi["status"] = "needs_script"
+        for item in items:
+            queue_id = item["queue_id"]
+
+            # Skip already completed
+            if queue_id in completed_ids:
+                continue
+
+            # Skip items with no script
+            script = REPO_ROOT / item["script"]
+            if not script.exists():
+                print(f"[runner] Skipping {queue_id} ({item['claim_id']}) — script not found: {item['script']}", flush=True)
+                # Update queue item status in live status file
+                for qi in status["queue"]:
+                    if qi["queue_id"] == queue_id:
+                        qi["status"] = "needs_script"
+                write_status(status, status_path)
+                continue
+
+            # Run it
+            result = run_experiment(item, status, status_path, calibration)
+            ran_any = True
+
+            # Move to completed
+            completed_entry = {
+                "queue_id": queue_id,
+                "backlog_id": item.get("backlog_id", ""),
+                "claim_id": item.get("claim_id", ""),
+                "title": item.get("title", ""),
+                "description": item.get("description", ""),
+                "result": result["result"],
+                "result_summary": result["result_summary"],
+                "completed_at": result["completed_at"],
+                "output_file": result.get("output_file", ""),
+            }
+            status["completed"].append(completed_entry)
+            completed_ids.add(queue_id)
+
+            # Remove from queue display
+            status["queue"] = [qi for qi in status["queue"] if qi["queue_id"] != queue_id]
+            status["current"] = None
+
             write_status(status, status_path)
-            continue
+            print(f"[runner] Done: {queue_id} — {result['result']}", flush=True)
 
-        # Run it
-        result = run_experiment(item, status, status_path, calibration)
+        # Queue pass complete
+        if not args.loop:
+            break
 
-        # Move to completed
-        completed_entry = {
-            "queue_id": queue_id,
-            "backlog_id": item.get("backlog_id", ""),
-            "claim_id": item.get("claim_id", ""),
-            "title": item.get("title", ""),
-            "description": item.get("description", ""),
-            "result": result["result"],
-            "result_summary": result["result_summary"],
-            "completed_at": result["completed_at"],
-            "output_file": result.get("output_file", ""),
-        }
-        status["completed"].append(completed_entry)
-        completed_ids.add(queue_id)
-
-        # Remove from queue display
-        status["queue"] = [qi for qi in status["queue"] if qi["queue_id"] != queue_id]
+        # Loop mode: wait, then reload queue for any newly-added items
+        status["idle"] = True
         status["current"] = None
-
         write_status(status, status_path)
-        print(f"[runner] Done: {queue_id} — {result['result']}", flush=True)
+        if ran_any:
+            print(f"[runner] Pass complete. Waiting {args.loop_interval}s before re-checking queue…", flush=True)
+        else:
+            print(f"[runner] No new items. Waiting {args.loop_interval}s…", flush=True)
 
-    # All done
+        time.sleep(args.loop_interval)
+
+        # Reload queue — picks up any new items added while we slept
+        queue_data = load_queue()
+        calibration = queue_data.get("calibration", {})
+        items = queue_data.get("items", [])
+
+        new_pending = [i for i in items if i["queue_id"] not in completed_ids]
+        if new_pending:
+            print(f"[runner] Found {len(new_pending)} new item(s): "
+                  f"{[i['queue_id'] for i in new_pending]}", flush=True)
+            # Rebuild queue display in status
+            new_queue_display = []
+            for i in new_pending:
+                new_queue_display.append({
+                    "queue_id": i["queue_id"],
+                    "backlog_id": i.get("backlog_id", ""),
+                    "claim_id": i.get("claim_id", ""),
+                    "title": i.get("title", ""),
+                    "description": i.get("description", ""),
+                    "estimated_minutes": round(estimate_minutes(i, calibration), 1),
+                    "status": "pending",
+                    "status_reason": i.get("status_reason", ""),
+                })
+            status["queue"] = new_queue_display
+            status["idle"] = False
+            write_status(status, status_path)
+
+    # All done (non-loop path)
     status["idle"] = True
     status["current"] = None
     status["runner_pid"] = None
