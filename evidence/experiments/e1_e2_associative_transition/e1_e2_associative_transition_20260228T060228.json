@@ -1,0 +1,188 @@
+{
+  "experiment": "e1_e2_associative_transition",
+  "claim": "MECH-058",
+  "exq_id": "EXQ-006",
+  "run_timestamp": "2026-02-28T05:23:20.509997+00:00",
+  "config": {
+    "num_episodes": 200,
+    "max_steps": 100,
+    "seeds": [
+      7,
+      42,
+      99
+    ],
+    "grid_size": 14,
+    "quadrant_hazards": [
+      6,
+      1,
+      3,
+      4
+    ],
+    "quadrant_resources": [
+      1,
+      4,
+      2,
+      2
+    ],
+    "full_e1_lr": 0.0001,
+    "full_policy_lr": 0.001,
+    "same_rate_e1_lr": 0.001,
+    "same_rate_policy_lr": 0.001
+  },
+  "verdict": "FAIL",
+  "aggregate": {
+    "full_last_quarter_harm": 1.11,
+    "e1_frozen_last_quarter_harm": 1.1467,
+    "e2_frozen_last_quarter_harm": 1.11,
+    "same_rate_last_quarter_harm": 1.11,
+    "associative_criterion_met": true,
+    "transition_criterion_met": false,
+    "rate_criterion_met": true
+  },
+  "per_run": [
+    {
+      "condition": "FULL",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.03,
+      "last_quarter_harm": 1.09,
+      "mean_e1_loss": 0.002525,
+      "episode_count": 200
+    },
+    {
+      "condition": "E1_FROZEN",
+      "seed": 7,
+      "freeze_e1": true,
+      "freeze_e2": false,
+      "e1_lr": 0.0,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.13,
+      "last_quarter_harm": 1.16,
+      "mean_e1_loss": 0.0,
+      "episode_count": 200
+    },
+    {
+      "condition": "E2_FROZEN",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": true,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.03,
+      "last_quarter_harm": 1.09,
+      "mean_e1_loss": 0.002525,
+      "episode_count": 200
+    },
+    {
+      "condition": "SAME_RATE",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.03,
+      "last_quarter_harm": 1.09,
+      "mean_e1_loss": 0.000435,
+      "episode_count": 200
+    },
+    {
+      "condition": "FULL",
+      "seed": 42,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.11,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.00252,
+      "episode_count": 200
+    },
+    {
+      "condition": "E1_FROZEN",
+      "seed": 42,
+      "freeze_e1": true,
+      "freeze_e2": false,
+      "e1_lr": 0.0,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.12,
+      "last_quarter_harm": 1.16,
+      "mean_e1_loss": 0.0,
+      "episode_count": 200
+    },
+    {
+      "condition": "E2_FROZEN",
+      "seed": 42,
+      "freeze_e1": false,
+      "freeze_e2": true,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.11,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.00252,
+      "episode_count": 200
+    },
+    {
+      "condition": "SAME_RATE",
+      "seed": 42,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.11,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.000541,
+      "episode_count": 200
+    },
+    {
+      "condition": "FULL",
+      "seed": 99,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.05,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.003143,
+      "episode_count": 200
+    },
+    {
+      "condition": "E1_FROZEN",
+      "seed": 99,
+      "freeze_e1": true,
+      "freeze_e2": false,
+      "e1_lr": 0.0,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.21,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.0,
+      "episode_count": 200
+    },
+    {
+      "condition": "E2_FROZEN",
+      "seed": 99,
+      "freeze_e1": false,
+      "freeze_e2": true,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.05,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.003143,
+      "episode_count": 200
+    },
+    {
+      "condition": "SAME_RATE",
+      "seed": 99,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.05,
+      "last_quarter_harm": 1.12,
+      "mean_e1_loss": 0.00075,
+      "episode_count": 200
+    }
+  ]
+}

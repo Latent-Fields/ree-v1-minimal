@@ -1,0 +1,132 @@
+{
+  "experiment": "residue_weight_sensitivity",
+  "claim": "MECH-062",
+  "evb_id": "EVB-0032",
+  "run_timestamp": "2026-02-28T16:29:24.814195+00:00",
+  "config": {
+    "num_episodes": 200,
+    "max_steps": 100,
+    "seeds": [
+      7,
+      42,
+      99
+    ],
+    "grid_size": 10,
+    "num_hazards": 4,
+    "conditions": {
+      "RHO_ZERO": 0.0,
+      "RHO_LOW": 0.1,
+      "RHO_STANDARD": 0.5,
+      "RHO_HIGH": 2.0
+    }
+  },
+  "verdict": "PASS",
+  "partial_support": false,
+  "aggregate": {
+    "rho_zero_harm_last_quarter": 0.9,
+    "rho_low_harm_last_quarter": 0.9187,
+    "rho_standard_harm_last_quarter": 0.826,
+    "rho_high_harm_last_quarter": 0.7487,
+    "routing_criterion_met": true,
+    "stability_criterion_met": true,
+    "stability_tolerance_factor": 1.2
+  },
+  "per_run": [
+    {
+      "condition": "RHO_ZERO",
+      "rho_residue": 0.0,
+      "seed": 7,
+      "first_quarter_harm": 0.868,
+      "last_quarter_harm": 0.846,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_LOW",
+      "rho_residue": 0.1,
+      "seed": 7,
+      "first_quarter_harm": 0.96,
+      "last_quarter_harm": 0.976,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_STANDARD",
+      "rho_residue": 0.5,
+      "seed": 7,
+      "first_quarter_harm": 0.916,
+      "last_quarter_harm": 0.866,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_HIGH",
+      "rho_residue": 2.0,
+      "seed": 7,
+      "first_quarter_harm": 0.86,
+      "last_quarter_harm": 0.822,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_ZERO",
+      "rho_residue": 0.0,
+      "seed": 42,
+      "first_quarter_harm": 0.988,
+      "last_quarter_harm": 0.9,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_LOW",
+      "rho_residue": 0.1,
+      "seed": 42,
+      "first_quarter_harm": 0.882,
+      "last_quarter_harm": 0.898,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_STANDARD",
+      "rho_residue": 0.5,
+      "seed": 42,
+      "first_quarter_harm": 0.878,
+      "last_quarter_harm": 0.88,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_HIGH",
+      "rho_residue": 2.0,
+      "seed": 42,
+      "first_quarter_harm": 0.854,
+      "last_quarter_harm": 0.65,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_ZERO",
+      "rho_residue": 0.0,
+      "seed": 99,
+      "first_quarter_harm": 0.834,
+      "last_quarter_harm": 0.954,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_LOW",
+      "rho_residue": 0.1,
+      "seed": 99,
+      "first_quarter_harm": 0.902,
+      "last_quarter_harm": 0.882,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_STANDARD",
+      "rho_residue": 0.5,
+      "seed": 99,
+      "first_quarter_harm": 0.832,
+      "last_quarter_harm": 0.732,
+      "episode_count": 200
+    },
+    {
+      "condition": "RHO_HIGH",
+      "rho_residue": 2.0,
+      "seed": 99,
+      "first_quarter_harm": 0.908,
+      "last_quarter_harm": 0.774,
+      "episode_count": 200
+    }
+  ]
+}

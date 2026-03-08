@@ -1,0 +1,156 @@
+{
+  "experiment": "commitment_boundary_validation",
+  "claim": "MECH-061",
+  "evb_id": "EVB-0041",
+  "run_timestamp": "2026-02-28T20:32:45.632587+00:00",
+  "config": {
+    "num_episodes": 200,
+    "max_steps": 100,
+    "seeds": [
+      13,
+      77,
+      123,
+      256,
+      314,
+      999
+    ],
+    "grid_size": 10,
+    "num_hazards": 4,
+    "blend_alpha": 0.5,
+    "e1_lr": 0.0001,
+    "policy_lr": 0.001
+  },
+  "verdict": "PASS",
+  "partial_support": false,
+  "aggregate": {
+    "with_boundary_harm_last_quarter": 0.893,
+    "blended_harm_last_quarter": 0.862,
+    "mean_abs_pre_post_corr_with_boundary": 0.2141,
+    "corr_threshold": 0.7,
+    "harm_tolerance_factor": 1.05,
+    "distinct_signals_criterion_met": true,
+    "boundary_helps_criterion_met": true
+  },
+  "per_run": [
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 13,
+      "first_quarter_harm": 0.906,
+      "last_quarter_harm": 0.854,
+      "mean_prediction_error": 0.52683,
+      "pre_post_corr": -0.171,
+      "abs_pre_post_corr": 0.171,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 13,
+      "first_quarter_harm": 0.936,
+      "last_quarter_harm": 0.868,
+      "mean_prediction_error": 0.521461,
+      "pre_post_corr": -0.0123,
+      "abs_pre_post_corr": 0.0123,
+      "episode_count": 200
+    },
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 77,
+      "first_quarter_harm": 0.986,
+      "last_quarter_harm": 0.91,
+      "mean_prediction_error": 0.455974,
+      "pre_post_corr": 0.549,
+      "abs_pre_post_corr": 0.549,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 77,
+      "first_quarter_harm": 0.856,
+      "last_quarter_harm": 0.87,
+      "mean_prediction_error": 0.463769,
+      "pre_post_corr": 0.3637,
+      "abs_pre_post_corr": 0.3637,
+      "episode_count": 200
+    },
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 123,
+      "first_quarter_harm": 0.896,
+      "last_quarter_harm": 0.936,
+      "mean_prediction_error": 0.475302,
+      "pre_post_corr": -0.3039,
+      "abs_pre_post_corr": 0.3039,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 123,
+      "first_quarter_harm": 0.928,
+      "last_quarter_harm": 0.846,
+      "mean_prediction_error": 0.479009,
+      "pre_post_corr": -0.4139,
+      "abs_pre_post_corr": 0.4139,
+      "episode_count": 200
+    },
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 256,
+      "first_quarter_harm": 0.904,
+      "last_quarter_harm": 0.864,
+      "mean_prediction_error": 0.461388,
+      "pre_post_corr": 0.1828,
+      "abs_pre_post_corr": 0.1828,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 256,
+      "first_quarter_harm": 0.89,
+      "last_quarter_harm": 0.928,
+      "mean_prediction_error": 0.45827,
+      "pre_post_corr": 0.4597,
+      "abs_pre_post_corr": 0.4597,
+      "episode_count": 200
+    },
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 314,
+      "first_quarter_harm": 0.914,
+      "last_quarter_harm": 0.832,
+      "mean_prediction_error": 0.533053,
+      "pre_post_corr": 0.0615,
+      "abs_pre_post_corr": 0.0615,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 314,
+      "first_quarter_harm": 0.942,
+      "last_quarter_harm": 0.754,
+      "mean_prediction_error": 0.532532,
+      "pre_post_corr": 0.091,
+      "abs_pre_post_corr": 0.091,
+      "episode_count": 200
+    },
+    {
+      "condition": "WITH-BOUNDARY",
+      "seed": 999,
+      "first_quarter_harm": 0.846,
+      "last_quarter_harm": 0.962,
+      "mean_prediction_error": 0.495292,
+      "pre_post_corr": 0.0162,
+      "abs_pre_post_corr": 0.0162,
+      "episode_count": 200
+    },
+    {
+      "condition": "BLENDED",
+      "seed": 999,
+      "first_quarter_harm": 0.884,
+      "last_quarter_harm": 0.906,
+      "mean_prediction_error": 0.494006,
+      "pre_post_corr": 0.069,
+      "abs_pre_post_corr": 0.069,
+      "episode_count": 200
+    }
+  ]
+}

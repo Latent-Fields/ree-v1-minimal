@@ -1,0 +1,106 @@
+{
+  "experiment": "candidate_count_ablation",
+  "claim": "MECH-063",
+  "evb_id": "EVB-0036",
+  "run_timestamp": "2026-02-28T14:31:29.568558+00:00",
+  "config": {
+    "num_episodes": 200,
+    "max_steps": 100,
+    "seeds": [
+      7,
+      42,
+      99
+    ],
+    "grid_size": 10,
+    "num_hazards": 4,
+    "conditions": {
+      "SINGLE": 1,
+      "STANDARD": 32,
+      "EXPANDED": 128
+    }
+  },
+  "verdict": "PASS",
+  "partial_support": false,
+  "aggregate": {
+    "single_harm_last_quarter": 0.9547,
+    "standard_harm_last_quarter": 0.854,
+    "expanded_harm_last_quarter": 0.836,
+    "selection_criterion_met": true,
+    "stability_criterion_met": true,
+    "stability_tolerance_factor": 1.1
+  },
+  "per_run": [
+    {
+      "condition": "SINGLE",
+      "num_candidates": 1,
+      "seed": 7,
+      "first_quarter_harm": 0.97,
+      "last_quarter_harm": 0.964,
+      "episode_count": 200
+    },
+    {
+      "condition": "STANDARD",
+      "num_candidates": 32,
+      "seed": 7,
+      "first_quarter_harm": 0.846,
+      "last_quarter_harm": 0.81,
+      "episode_count": 200
+    },
+    {
+      "condition": "EXPANDED",
+      "num_candidates": 128,
+      "seed": 7,
+      "first_quarter_harm": 0.916,
+      "last_quarter_harm": 0.852,
+      "episode_count": 200
+    },
+    {
+      "condition": "SINGLE",
+      "num_candidates": 1,
+      "seed": 42,
+      "first_quarter_harm": 0.936,
+      "last_quarter_harm": 0.92,
+      "episode_count": 200
+    },
+    {
+      "condition": "STANDARD",
+      "num_candidates": 32,
+      "seed": 42,
+      "first_quarter_harm": 0.862,
+      "last_quarter_harm": 0.854,
+      "episode_count": 200
+    },
+    {
+      "condition": "EXPANDED",
+      "num_candidates": 128,
+      "seed": 42,
+      "first_quarter_harm": 0.954,
+      "last_quarter_harm": 0.78,
+      "episode_count": 200
+    },
+    {
+      "condition": "SINGLE",
+      "num_candidates": 1,
+      "seed": 99,
+      "first_quarter_harm": 0.924,
+      "last_quarter_harm": 0.98,
+      "episode_count": 200
+    },
+    {
+      "condition": "STANDARD",
+      "num_candidates": 32,
+      "seed": 99,
+      "first_quarter_harm": 0.914,
+      "last_quarter_harm": 0.898,
+      "episode_count": 200
+    },
+    {
+      "condition": "EXPANDED",
+      "num_candidates": 128,
+      "seed": 99,
+      "first_quarter_harm": 0.914,
+      "last_quarter_harm": 0.876,
+      "episode_count": 200
+    }
+  ]
+}

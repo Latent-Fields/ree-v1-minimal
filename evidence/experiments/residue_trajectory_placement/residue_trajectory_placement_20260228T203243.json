@@ -1,0 +1,141 @@
+{
+  "experiment": "residue_trajectory_placement",
+  "claim": "MECH-056",
+  "evb_id": "EVB-0039",
+  "run_timestamp": "2026-02-28T19:11:02.450205+00:00",
+  "config": {
+    "num_episodes": 200,
+    "max_steps": 100,
+    "seeds": [
+      13,
+      77,
+      123,
+      256,
+      314,
+      999
+    ],
+    "grid_size": 10,
+    "num_hazards": 4,
+    "intermediate_weight_scheme": "linear_ramp_i_over_H"
+  },
+  "verdict": "PASS",
+  "partial_support": false,
+  "aggregate": {
+    "trajectory_wide_harm_last_quarter": 0.804,
+    "endpoint_only_harm_last_quarter": 0.9363,
+    "trajectory_wide_mean_intermediate_residue_mass": 3.78075,
+    "harm_tolerance_factor": 1.05,
+    "path_spread_criterion_met": true,
+    "harm_avoidance_criterion_met": true
+  },
+  "per_run": [
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 13,
+      "first_quarter_harm": 0.858,
+      "last_quarter_harm": 0.698,
+      "mean_intermediate_residue_mass": 3.36825,
+      "mean_trajectory_residue_cost": 173.0492,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 13,
+      "first_quarter_harm": 1.002,
+      "last_quarter_harm": 0.932,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 21.517868,
+      "episode_count": 200
+    },
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 77,
+      "first_quarter_harm": 0.934,
+      "last_quarter_harm": 0.77,
+      "mean_intermediate_residue_mass": 3.62925,
+      "mean_trajectory_residue_cost": 143.241277,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 77,
+      "first_quarter_harm": 0.948,
+      "last_quarter_harm": 0.858,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 19.184329,
+      "episode_count": 200
+    },
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 123,
+      "first_quarter_harm": 0.93,
+      "last_quarter_harm": 0.886,
+      "mean_intermediate_residue_mass": 4.095,
+      "mean_trajectory_residue_cost": 165.546542,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 123,
+      "first_quarter_harm": 0.998,
+      "last_quarter_harm": 0.974,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 19.500573,
+      "episode_count": 200
+    },
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 256,
+      "first_quarter_harm": 0.91,
+      "last_quarter_harm": 0.858,
+      "mean_intermediate_residue_mass": 3.87675,
+      "mean_trajectory_residue_cost": 203.094658,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 256,
+      "first_quarter_harm": 0.884,
+      "last_quarter_harm": 0.928,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 18.853364,
+      "episode_count": 200
+    },
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 314,
+      "first_quarter_harm": 1.008,
+      "last_quarter_harm": 0.876,
+      "mean_intermediate_residue_mass": 3.92175,
+      "mean_trajectory_residue_cost": 176.729597,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 314,
+      "first_quarter_harm": 0.856,
+      "last_quarter_harm": 0.922,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 18.366016,
+      "episode_count": 200
+    },
+    {
+      "condition": "TRAJECTORY-WIDE",
+      "seed": 999,
+      "first_quarter_harm": 0.938,
+      "last_quarter_harm": 0.736,
+      "mean_intermediate_residue_mass": 3.7935,
+      "mean_trajectory_residue_cost": 223.606388,
+      "episode_count": 200
+    },
+    {
+      "condition": "ENDPOINT-ONLY",
+      "seed": 999,
+      "first_quarter_harm": 0.92,
+      "last_quarter_harm": 1.004,
+      "mean_intermediate_residue_mass": 0.0,
+      "mean_trajectory_residue_cost": 25.58213,
+      "episode_count": 200
+    }
+  ]
+}

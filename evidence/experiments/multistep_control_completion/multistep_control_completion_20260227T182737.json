@@ -1,0 +1,52 @@
+{
+  "experiment": "multistep_control_completion",
+  "claim": "MECH-057",
+  "exq_id": "EXQ-007",
+  "run_timestamp": "2026-02-27T18:27:24.727745+00:00",
+  "config": {
+    "num_episodes": 2,
+    "max_steps": 100,
+    "seeds": [
+      7
+    ],
+    "grid_size": 10,
+    "num_hazards": 4,
+    "macro_length": 4,
+    "e1_lr": 0.0001,
+    "policy_lr": 0.001
+  },
+  "verdict": "FAIL",
+  "aggregate": {
+    "gated_last_quarter_harm": 1.5,
+    "ungated_last_quarter_harm": 1.0,
+    "no_macro_last_quarter_harm": 0.7,
+    "gate_vs_ungated_criterion_met": false,
+    "gate_vs_no_macro_criterion_met": false
+  },
+  "per_run": [
+    {
+      "condition": "GATED",
+      "seed": 7,
+      "macro_length": 4,
+      "first_quarter_harm": 1.2,
+      "last_quarter_harm": 1.5,
+      "episode_count": 2
+    },
+    {
+      "condition": "UNGATED",
+      "seed": 7,
+      "macro_length": 4,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 1.0,
+      "episode_count": 2
+    },
+    {
+      "condition": "NO_MACRO",
+      "seed": 7,
+      "macro_length": 1,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 0.7,
+      "episode_count": 2
+    }
+  ]
+}

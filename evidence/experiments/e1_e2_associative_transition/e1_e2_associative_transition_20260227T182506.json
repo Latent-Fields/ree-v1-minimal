@@ -1,0 +1,90 @@
+{
+  "experiment": "e1_e2_associative_transition",
+  "claim": "MECH-058",
+  "exq_id": "EXQ-006",
+  "run_timestamp": "2026-02-27T18:25:04.503200+00:00",
+  "config": {
+    "num_episodes": 2,
+    "max_steps": 100,
+    "seeds": [
+      7
+    ],
+    "grid_size": 14,
+    "quadrant_hazards": [
+      6,
+      1,
+      3,
+      4
+    ],
+    "quadrant_resources": [
+      1,
+      4,
+      2,
+      2
+    ],
+    "full_e1_lr": 0.0001,
+    "full_policy_lr": 0.001,
+    "same_rate_e1_lr": 0.001,
+    "same_rate_policy_lr": 0.001
+  },
+  "verdict": "FAIL",
+  "aggregate": {
+    "full_last_quarter_harm": 1.0,
+    "e1_frozen_last_quarter_harm": 1.0,
+    "e2_frozen_last_quarter_harm": 1.0,
+    "same_rate_last_quarter_harm": 1.0,
+    "associative_criterion_met": false,
+    "transition_criterion_met": false,
+    "rate_criterion_met": true
+  },
+  "per_run": [
+    {
+      "condition": "FULL",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 1.0,
+      "mean_e1_loss": 0.006163,
+      "episode_count": 2
+    },
+    {
+      "condition": "E1_FROZEN",
+      "seed": 7,
+      "freeze_e1": true,
+      "freeze_e2": false,
+      "e1_lr": 0.0,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 1.0,
+      "mean_e1_loss": 0.0,
+      "episode_count": 2
+    },
+    {
+      "condition": "E2_FROZEN",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": true,
+      "e1_lr": 0.0001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 1.0,
+      "mean_e1_loss": 0.006163,
+      "episode_count": 2
+    },
+    {
+      "condition": "SAME_RATE",
+      "seed": 7,
+      "freeze_e1": false,
+      "freeze_e2": false,
+      "e1_lr": 0.001,
+      "policy_lr": 0.001,
+      "first_quarter_harm": 1.0,
+      "last_quarter_harm": 1.0,
+      "mean_e1_loss": 0.005889,
+      "episode_count": 2
+    }
+  ]
+}
