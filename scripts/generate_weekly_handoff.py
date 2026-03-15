@@ -291,7 +291,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--ree-v2-handoff",
-        default="/Users/dgolden/Documents/GitHub/ree-v2/evidence/planning/weekly_handoff/latest.md",
+        default="/Users/dgolden/Documents/GitHub/REE_Working/ree-v2/evidence/planning/weekly_handoff/latest.md",
         help="Path to latest ree-v2 handoff report used for parity note.",
     )
     parser.add_argument(
